@@ -1,0 +1,2558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Image Converter - Convert Images to WebP, PNG, JPEG, GIF in Browser</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="description" content="Free offline browser based image converter. Convert images between WebP, PNG, JPEG, and GIF formats. Batch convert multiple images, control quality and file size. No upload required.">
+    <meta name="keywords" content="image converter, webp converter, png converter, jpeg converter, gif converter, image format converter, offline converter, free image converter">
+    <meta name="author" content="Image Converter">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Image Converter - Convert Images to WebP, PNG, JPEG, GIF in Browser">
+    <meta property="og:description" content="Free offline browser based image converter. Convert images between WebP, PNG, JPEG, and GIF formats. Batch convert multiple images, control quality and file size.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://atrii.dev">
+    <link rel="canonical" href="https://atrii.dev">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Image Converter - Convert Images to WebP, PNG, JPEG, GIF in Browser">
+    <meta name="twitter:description" content="Free offline browser based image converter. Convert images between WebP, PNG, JPEG, and GIF formats. Batch convert multiple images, control quality and file size.">
+    <meta name="theme-color" content="#15803d">
+    <meta name="msapplication-TileColor" content="#15803d">
+    <script>
+        (function () {
+            const key = 'imageConverterTheme';
+            const saved = localStorage.getItem(key);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
+    <link rel="preconnect" href="https://api.iconify.design">
+    <link rel="dns-prefetch" href="https://api.iconify.design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 142 40% 10%;
+            --card: 0 0% 100%;
+            --card-foreground: 142 40% 10%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 142 40% 10%;
+            --primary: 142 71% 35%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 142 35% 95%;
+            --secondary-foreground: 142 40% 15%;
+            --muted: 142 25% 96%;
+            --muted-foreground: 142 10% 40%;
+            --accent: 142 45% 92%;
+            --accent-foreground: 142 50% 15%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 142 20% 88%;
+            --input: 142 20% 88%;
+            --ring: 142 71% 35%;
+            --radius: 0.5rem;
+            --success: 142 76% 30%;
+            --success-foreground: 0 0% 98%;
+        }
+
+        html.dark {
+            --background: 142 25% 6%;
+            --foreground: 142 15% 95%;
+            --card: 142 22% 8%;
+            --card-foreground: 142 15% 95%;
+            --popover: 142 22% 8%;
+            --popover-foreground: 142 15% 95%;
+            --primary: 142 65% 45%;
+            --primary-foreground: 142 40% 6%;
+            --secondary: 142 18% 14%;
+            --secondary-foreground: 142 15% 95%;
+            --muted: 142 18% 14%;
+            --muted-foreground: 142 10% 62%;
+            --accent: 142 20% 16%;
+            --accent-foreground: 142 15% 95%;
+            --destructive: 0 62.8% 45%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 142 16% 18%;
+            --input: 142 16% 18%;
+            --ring: 142 65% 45%;
+            --success: 142 70% 42%;
+            --success-foreground: 142 40% 6%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background:
+                radial-gradient(ellipse at top, hsl(142 45% 94% / 0.55) 0%, transparent 55%),
+                hsl(var(--background));
+            color: hsl(var(--foreground));
+            min-height: 100vh;
+            padding: 1.5rem 1.5rem 0;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.2s ease, color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        html.dark body {
+            background:
+                radial-gradient(ellipse at top, hsl(142 35% 12% / 0.45) 0%, transparent 55%),
+                hsl(var(--background));
+        }
+
+        .theme-switcher {
+            display: inline-flex;
+            padding: 0.25rem;
+            gap: 0.125rem;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) + 2px);
+            box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+        }
+
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            height: 2rem;
+            padding: 0 0.625rem;
+            border: none;
+            border-radius: var(--radius);
+            background: transparent;
+            color: hsl(var(--muted-foreground));
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+        }
+
+        .theme-toggle-btn:hover {
+            color: hsl(var(--foreground));
+            background: hsl(var(--accent));
+        }
+
+        .theme-toggle-btn.active {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
+        }
+
+        .theme-toggle-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring) / 0.35);
+        }
+
+        .theme-toggle-btn iconify-icon {
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .theme-toggle-btn span {
+                display: none;
+            }
+
+            .theme-toggle-btn {
+                width: 2rem;
+                padding: 0;
+            }
+        }
+
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.9375rem;
+            max-width: 32rem;
+            margin: 0 auto;
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--primary) / 0.2);
+            background: hsl(var(--primary) / 0.08);
+            color: hsl(var(--primary));
+            padding: 0.125rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .card {
+            background: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) + 2px);
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .card-header {
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .card-description {
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+            margin-top: 0.25rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card + .card {
+            margin-top: 1rem;
+        }
+
+        .separator {
+            height: 1px;
+            background: hsl(var(--border));
+            margin: 1.25rem 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.25rem;
+            }
+
+            .format-flow-arrow {
+                align-self: center;
+                height: 2rem;
+                width: 2rem;
+                margin: 0.125rem 0;
+                border-radius: 9999px;
+                background: hsl(var(--primary) / 0.1);
+                color: hsl(var(--primary));
+            }
+
+            .format-flow-arrow iconify-icon {
+                transform: rotate(90deg);
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .input {
+            display: flex;
+            height: 2.5rem;
+            width: 100%;
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--input));
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            padding: 0 0.75rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring) / 0.2);
+        }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            height: 2.5rem;
+            width: 100%;
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--input));
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            padding: 0 0.75rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .custom-select-trigger:hover {
+            background: hsl(var(--accent));
+        }
+
+        .custom-select.open .custom-select-trigger,
+        .custom-select-trigger:focus-visible {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring) / 0.2);
+        }
+
+        .custom-select-value {
+            flex: 1;
+            text-align: left;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .custom-select-chevron {
+            color: hsl(var(--muted-foreground));
+            transition: transform 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .custom-select.open .custom-select-chevron {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-menu {
+            position: absolute;
+            top: calc(100% + 0.25rem);
+            left: 0;
+            right: 0;
+            z-index: 40;
+            max-height: 15rem;
+            overflow-y: auto;
+            padding: 0.25rem;
+            border-radius: calc(var(--radius) + 2px);
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--popover));
+            color: hsl(var(--popover-foreground));
+            box-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+        }
+
+        .custom-select-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 2.25rem;
+            padding: 0.5rem 0.625rem;
+            border: none;
+            border-radius: calc(var(--radius) - 2px);
+            background: transparent;
+            color: inherit;
+            font-size: 0.875rem;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.12s, color 0.12s;
+        }
+
+        .custom-select-option:hover,
+        .custom-select-option.focused {
+            background: hsl(var(--accent));
+            color: hsl(var(--accent-foreground));
+        }
+
+        .custom-select-option.selected {
+            color: hsl(var(--primary));
+            font-weight: 600;
+        }
+
+        .custom-select-option-check {
+            opacity: 0;
+            color: hsl(var(--primary));
+            flex-shrink: 0;
+        }
+
+        .custom-select-option.selected .custom-select-option-check {
+            opacity: 1;
+        }
+
+        .format-flow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5rem;
+            color: hsl(var(--muted-foreground));
+            flex-shrink: 0;
+        }
+
+        .format-flow-arrow iconify-icon {
+            display: block;
+            transition: transform 0.15s ease;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 540px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .range-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .range-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .custom-slider {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-height: 2.5rem;
+            padding: 0 0.5rem;
+            touch-action: none;
+        }
+
+        .custom-slider-track {
+            position: relative;
+            width: 100%;
+            height: 0.375rem;
+            background: hsl(var(--muted));
+            border-radius: 9999px;
+            cursor: pointer;
+        }
+
+        .custom-slider-range {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: hsl(var(--primary));
+            border-radius: 9999px;
+            pointer-events: none;
+        }
+
+        .custom-slider-thumb {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            width: 1.125rem;
+            height: 1.125rem;
+            transform: translate(-50%, -50%);
+            border-radius: 9999px;
+            border: 2px solid hsl(var(--primary));
+            background: hsl(var(--background));
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+            cursor: grab;
+            transition: box-shadow 0.15s, border-color 0.15s;
+        }
+
+        .custom-slider-thumb:hover {
+            box-shadow: 0 0 0 4px hsl(var(--primary) / 0.12);
+        }
+
+        .custom-slider-thumb:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring) / 0.35);
+        }
+
+        .custom-slider.dragging .custom-slider-thumb {
+            cursor: grabbing;
+            box-shadow: 0 0 0 6px hsl(var(--primary) / 0.18);
+        }
+
+        .range-value {
+            min-width: 2.75rem;
+            text-align: right;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: hsl(var(--muted-foreground));
+            font-variant-numeric: tabular-nums;
+        }
+
+        .drop-zone {
+            border: 2px dashed hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            transition: border-color 0.15s, background 0.15s;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: hsl(var(--primary));
+            background: hsl(var(--primary) / 0.06);
+        }
+
+        .drop-zone-icon {
+            display: block;
+            width: 2.5rem;
+            height: 2.5rem;
+            margin: 0 auto 0.75rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        iconify-icon {
+            display: inline-block;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .btn iconify-icon {
+            pointer-events: none;
+        }
+
+        .drop-zone p {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+
+        .drop-zone p strong {
+            color: hsl(var(--foreground));
+            font-weight: 500;
+        }
+
+        .drop-zone .hint {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            height: 2.5rem;
+            padding: 0 1rem;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s;
+        }
+
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring) / 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: hsl(var(--primary) / 0.9);
+        }
+
+        .btn-secondary {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: hsl(var(--secondary) / 0.8);
+        }
+
+        .btn-outline {
+            background: hsl(var(--background));
+            border-color: hsl(var(--input));
+            color: hsl(var(--foreground));
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: hsl(var(--accent));
+        }
+
+        .btn-destructive {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+        }
+
+        .btn-destructive:hover:not(:disabled) {
+            background: hsl(var(--destructive) / 0.9);
+        }
+
+        .btn-success {
+            background: hsl(var(--success));
+            color: hsl(var(--success-foreground));
+        }
+
+        .btn-success:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .btn-sm {
+            height: 2rem;
+            padding: 0 0.75rem;
+            font-size: 0.8125rem;
+        }
+
+        .btn-icon {
+            width: 2rem;
+            height: 2rem;
+            padding: 0;
+            border-radius: var(--radius);
+        }
+
+        .actions-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .actions-bar .btn-primary,
+        .actions-bar .btn-success {
+            flex: 1;
+            min-width: 10rem;
+        }
+
+        .preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: hsl(var(--muted) / 0.3);
+        }
+
+        .preview-item img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+            cursor: zoom-in;
+        }
+
+        .preview-item img:active {
+            opacity: 0.9;
+        }
+
+        .preview-meta {
+            padding: 0.5rem 0.625rem;
+            border-top: 1px solid hsl(var(--border));
+            background: hsl(var(--card));
+        }
+
+        .preview-name {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: hsl(var(--foreground));
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.25rem;
+        }
+
+        .preview-size {
+            font-size: 0.6875rem;
+            color: hsl(var(--muted-foreground));
+            font-variant-numeric: tabular-nums;
+        }
+
+        .preview-size.converted {
+            color: hsl(var(--primary));
+            font-weight: 500;
+            margin-top: 0.125rem;
+        }
+
+        .preview-actions {
+            position: absolute;
+            top: 0.375rem;
+            right: 0.375rem;
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .preview-checkbox {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            width: 1rem;
+            height: 1rem;
+            accent-color: hsl(var(--primary));
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .progress {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--muted) / 0.5);
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .progress.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid hsl(var(--border));
+            border-top-color: hsl(var(--primary));
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--muted) / 0.3);
+        }
+
+        .result-name {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .result-sizes {
+            font-size: 0.8125rem;
+            color: hsl(var(--muted-foreground));
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .result-sizes .arrow {
+            margin: 0 0.375rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .result-sizes .after {
+            color: hsl(var(--primary));
+            font-weight: 600;
+        }
+
+        .result-savings {
+            font-size: 0.75rem;
+            color: hsl(var(--primary));
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 1.5rem;
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+
+        .site-footer {
+            margin-top: 3rem;
+            border-top: 1px solid hsl(var(--border));
+            background: hsl(var(--card));
+            color: hsl(var(--muted-foreground));
+        }
+
+        .site-footer-inner {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 1.5rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+
+            .footer-brand {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-brand-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            letter-spacing: -0.025em;
+            margin-bottom: 0.625rem;
+        }
+
+        .footer-brand-title iconify-icon {
+            color: hsl(var(--primary));
+        }
+
+        .footer-brand-desc {
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            max-width: 22rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-mini-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+        }
+
+        .footer-mini-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--muted) / 0.5);
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: hsl(var(--foreground));
+        }
+
+        .footer-column-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: hsl(var(--foreground));
+            margin-bottom: 0.875rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+
+        .footer-links li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+        }
+
+        .footer-links iconify-icon {
+            color: hsl(var(--primary));
+            flex-shrink: 0;
+        }
+
+        .footer-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+        }
+
+        .footer-setting-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: hsl(var(--foreground));
+            margin-bottom: 0.375rem;
+        }
+
+        .footer-social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .social-btn,
+        .footer-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem;
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            font-family: inherit;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            width: fit-content;
+        }
+
+        .footer-btn {
+            cursor: pointer;
+        }
+
+        .footer-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .social-btn:hover,
+        .footer-btn:hover:not(:disabled) {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--primary) / 0.25);
+        }
+
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid hsl(var(--border));
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+        }
+
+        .footer-bottom-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .footer-bottom-meta iconify-icon {
+            color: hsl(var(--primary));
+        }
+
+        @media (max-width: 640px) {
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .gallery-dialog {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gallery-dialog.hidden {
+            display: none !important;
+        }
+
+        .gallery-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgb(0 0 0 / 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        .gallery-shell {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .gallery-shell > * {
+            pointer-events: auto;
+        }
+
+        .gallery-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: hsl(var(--background) / 0.95);
+            border-bottom: 1px solid hsl(var(--border));
+            flex-shrink: 0;
+        }
+
+        .gallery-counter {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: hsl(var(--muted-foreground));
+            font-variant-numeric: tabular-nums;
+            min-width: 3.5rem;
+        }
+
+        .gallery-title {
+            flex: 1;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .gallery-tools {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .gallery-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .gallery-viewport {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+            cursor: grab;
+            overflow: hidden;
+        }
+
+        .gallery-viewport.is-dragging {
+            cursor: grabbing;
+        }
+
+        .gallery-viewport.can-pan {
+            cursor: grab;
+        }
+
+        .gallery-image-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 100%;
+            max-height: 100%;
+            will-change: transform;
+            transition: transform 0.05s linear;
+        }
+
+        .gallery-image-wrap.no-transition {
+            transition: none;
+        }
+
+        .gallery-image-wrap img {
+            max-width: min(100vw, 100%);
+            max-height: calc(100vh - 7rem);
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--background) / 0.92);
+            color: hsl(var(--foreground));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s, opacity 0.15s;
+        }
+
+        .gallery-nav:hover:not(:disabled) {
+            background: hsl(var(--accent));
+        }
+
+        .gallery-nav:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .gallery-nav.prev { left: 1rem; }
+        .gallery-nav.next { right: 1rem; }
+
+        .gallery-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            background: hsl(var(--background) / 0.95);
+            border-top: 1px solid hsl(var(--border));
+            flex-shrink: 0;
+        }
+
+        .gallery-hint {
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        @media (max-width: 640px) {
+            .gallery-nav.prev { left: 0.5rem; }
+            .gallery-nav.next { right: 0.5rem; }
+
+            .gallery-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1>Image Converter</h1>
+            <p>Convert images instantly in your browser. No uploads, no limits — WebP, PNG, JPEG, and GIF.</p>
+            <div class="badge-row">
+                <span class="badge">100% Offline</span>
+                <span class="badge">Batch Convert</span>
+                <span class="badge">Privacy First</span>
+            </div>
+        </header>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Conversion Settings</h2>
+                <p class="card-description">Choose source and target formats. Your last selection is remembered.</p>
+            </div>
+            <div class="card-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="label" id="fromFormatLabel">From</label>
+                        <div class="custom-select" id="fromFormat" role="combobox" aria-labelledby="fromFormatLabel" aria-haspopup="listbox"></div>
+                    </div>
+                    <div class="format-flow-arrow" aria-hidden="true">
+                        <iconify-icon icon="lucide:arrow-right" width="20" height="20"></iconify-icon>
+                    </div>
+                    <div class="form-group">
+                        <label class="label" id="toFormatLabel">To</label>
+                        <div class="custom-select" id="toFormat" role="combobox" aria-labelledby="toFormatLabel" aria-haspopup="listbox"></div>
+                    </div>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="controls-grid">
+                    <div class="form-group">
+                        <label class="label" for="maxSize">Max Size (KB)</label>
+                        <input class="input" type="number" id="maxSize" min="1" value="1024">
+                    </div>
+                    <div class="range-group">
+                        <label class="label" id="qualityLabel">Quality</label>
+                        <div class="range-wrap">
+                            <div class="custom-slider" id="quality" role="slider" aria-labelledby="qualityLabel" aria-valuemin="1" aria-valuemax="100" aria-valuenow="90" tabindex="0"></div>
+                            <span class="range-value" id="qualityValue">90%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Upload Images</h2>
+                <p class="card-description">Drag and drop or browse files matching your source format.</p>
+            </div>
+            <div class="card-content">
+                <div class="drop-zone" id="dropZone">
+                    <iconify-icon class="drop-zone-icon" icon="lucide:upload" width="40" height="40"></iconify-icon>
+                    <p><strong>Drop images here</strong></p>
+                    <p>or click to browse</p>
+                    <p class="hint" id="acceptHint">Accepts PNG files</p>
+                    <input type="file" id="fileInput" hidden multiple>
+                </div>
+
+                <div class="preview" id="preview"></div>
+
+                <div class="progress" id="progress">
+                    <div class="spinner"></div>
+                    <span>Converting images…</span>
+                </div>
+
+                <div class="select-actions hidden" id="selectActions">
+                    <div class="actions-bar">
+                        <button class="btn btn-outline btn-sm" type="button" onclick="selectAllImages()">Select All</button>
+                        <button class="btn btn-outline btn-sm" type="button" onclick="deselectAllImages()">Deselect All</button>
+                        <button class="btn btn-secondary btn-sm" type="button" onclick="convertSelected()" id="convertSelectedBtn" disabled>Convert Selected</button>
+                    </div>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary" type="button" id="convertOnlyBtn" disabled>
+                        <iconify-icon icon="lucide:refresh-cw" width="16" height="16"></iconify-icon>
+                        Convert
+                    </button>
+                    <button class="btn btn-primary" type="button" id="convertBtn" disabled>
+                        <iconify-icon icon="lucide:download" width="16" height="16"></iconify-icon>
+                        Convert &amp; Download
+                    </button>
+                    <button class="btn btn-success hidden" type="button" id="downloadBtn">
+                        <iconify-icon icon="lucide:folder-down" width="16" height="16"></iconify-icon>
+                        Download
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card hidden" id="resultsCard">
+            <div class="card-header">
+                <h2 class="card-title">Conversion Results</h2>
+                <p class="card-description">File sizes before and after conversion.</p>
+            </div>
+            <div class="card-content">
+                <div class="results-list" id="resultsList"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <iconify-icon icon="lucide:image" width="18" height="18"></iconify-icon>
+                        Image Converter
+                    </div>
+                    <p class="footer-brand-desc">
+                        Convert images instantly in your browser. Free, private, and fully offline — no uploads, no watermarks, no data collection.
+                    </p>
+                    <div class="footer-mini-badges">
+                        <span class="footer-mini-badge">
+                            <iconify-icon icon="lucide:wifi-off" width="12" height="12"></iconify-icon>
+                            Offline
+                        </span>
+                        <span class="footer-mini-badge">
+                            <iconify-icon icon="lucide:shield-check" width="12" height="12"></iconify-icon>
+                            Private
+                        </span>
+                        <span class="footer-mini-badge">
+                            <iconify-icon icon="lucide:zap" width="12" height="12"></iconify-icon>
+                            Fast
+                        </span>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Features</h3>
+                    <ul class="footer-links">
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> WebP, PNG, JPEG, GIF</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Batch conversion</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Quality &amp; size control</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Gallery preview &amp; zoom</li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Settings</h3>
+                    <div class="footer-settings">
+                        <div>
+                            <div class="footer-setting-label">Appearance</div>
+                            <div class="theme-switcher" role="group" aria-label="Theme">
+                                <button class="theme-toggle-btn" type="button" id="themeLightBtn" aria-pressed="true" aria-label="Light mode">
+                                    <iconify-icon icon="lucide:sun" width="14" height="14"></iconify-icon>
+                                    <span>Light</span>
+                                </button>
+                                <button class="theme-toggle-btn" type="button" id="themeDarkBtn" aria-pressed="false" aria-label="Dark mode">
+                                    <iconify-icon icon="lucide:moon" width="14" height="14"></iconify-icon>
+                                    <span>Dark</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="footer-setting-label">Storage</div>
+                            <button class="footer-btn" type="button" id="clearCacheBtn">
+                                <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>
+                                Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Connect</h3>
+                    <div class="footer-social-links">
+                        <a href="https://github.com/DevAtrii/Image-Converter-Offline" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            <iconify-icon icon="lucide:github" width="16" height="16"></iconify-icon>
+                            GitHub
+                        </a>
+                        <a href="https://www.youtube.com/@devatrii/videos" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            <iconify-icon icon="lucide:youtube" width="16" height="16"></iconify-icon>
+                            YouTube
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="footerYear"></span> Image Converter. All rights reserved.</p>
+                <p class="footer-bottom-meta">
+                    <iconify-icon icon="lucide:globe" width="14" height="14"></iconify-icon>
+                    Built for developers
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="gallery-dialog hidden" id="galleryDialog" role="dialog" aria-modal="true" aria-label="Image preview">
+        <div class="gallery-backdrop" id="galleryBackdrop"></div>
+        <div class="gallery-shell">
+            <div class="gallery-toolbar">
+                <span class="gallery-counter" id="galleryCounter">1 / 1</span>
+                <span class="gallery-title" id="galleryTitle"></span>
+                <div class="gallery-tools">
+                    <button class="btn btn-outline btn-icon btn-sm" type="button" id="galleryZoomOutBtn" title="Zoom out" aria-label="Zoom out">
+                        <iconify-icon icon="lucide:zoom-out" width="16" height="16"></iconify-icon>
+                    </button>
+                    <button class="btn btn-outline btn-icon btn-sm" type="button" id="galleryZoomInBtn" title="Zoom in" aria-label="Zoom in">
+                        <iconify-icon icon="lucide:zoom-in" width="16" height="16"></iconify-icon>
+                    </button>
+                    <button class="btn btn-outline btn-sm" type="button" id="galleryResetZoomBtn">
+                        <iconify-icon icon="lucide:scan" width="16" height="16"></iconify-icon>
+                        Reset
+                    </button>
+                    <button class="btn btn-outline btn-icon btn-sm" type="button" id="galleryCloseBtn" title="Close" aria-label="Close">
+                        <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="gallery-stage">
+                <button class="gallery-nav prev" type="button" id="galleryPrevBtn" aria-label="Previous image">
+                    <iconify-icon icon="lucide:chevron-left" width="18" height="18"></iconify-icon>
+                </button>
+                <div class="gallery-viewport" id="galleryViewport">
+                    <div class="gallery-image-wrap" id="galleryImageWrap">
+                        <img id="galleryImage" alt="">
+                    </div>
+                </div>
+                <button class="gallery-nav next" type="button" id="galleryNextBtn" aria-label="Next image">
+                    <iconify-icon icon="lucide:chevron-right" width="18" height="18"></iconify-icon>
+                </button>
+            </div>
+            <div class="gallery-footer">
+                <span class="gallery-hint">Pinch or scroll to zoom · Double-tap to toggle · Drag to pan · Arrow keys to navigate</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        function icon(name, size = 16) {
+            return `<iconify-icon icon="lucide:${name}" width="${size}" height="${size}"></iconify-icon>`;
+        }
+
+        const FORMAT_OPTIONS = [
+            { value: 'image/png', label: 'PNG' },
+            { value: 'image/jpeg', label: 'JPEG' },
+            { value: 'image/webp', label: 'WebP' },
+            { value: 'image/gif', label: 'GIF' }
+        ];
+
+        const customSelects = [];
+
+        class CustomSelect {
+            constructor(root, options, defaultValue) {
+                this.root = root;
+                this.options = options;
+                this._value = defaultValue || options[0].value;
+                this.open = false;
+                this.focusIndex = -1;
+                this.render();
+                this.bind();
+                this.updateUI(false);
+            }
+
+            get value() {
+                return this._value;
+            }
+
+            set value(nextValue) {
+                this.setValue(nextValue, false);
+            }
+
+            hasOption(value) {
+                return this.options.some(option => option.value === value);
+            }
+
+            render() {
+                this.root.innerHTML = `
+                    <button type="button" class="custom-select-trigger" aria-expanded="false" aria-haspopup="listbox">
+                        <span class="custom-select-value"></span>
+                        <span class="custom-select-chevron">${icon('chevron-down', 16)}</span>
+                    </button>
+                    <div class="custom-select-menu hidden" role="listbox">
+                        ${this.options.map(option => `
+                            <button type="button" class="custom-select-option" role="option" data-value="${option.value}" aria-selected="false">
+                                <span>${option.label}</span>
+                                <span class="custom-select-option-check">${icon('check', 16)}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+
+                this.trigger = this.root.querySelector('.custom-select-trigger');
+                this.valueEl = this.root.querySelector('.custom-select-value');
+                this.menu = this.root.querySelector('.custom-select-menu');
+                this.optionEls = Array.from(this.root.querySelectorAll('.custom-select-option'));
+            }
+
+            bind() {
+                this.trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggle();
+                });
+
+                this.optionEls.forEach((optionEl, index) => {
+                    optionEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.setValue(optionEl.dataset.value);
+                        this.close();
+                    });
+
+                    optionEl.addEventListener('mousemove', () => {
+                        this.setFocusedIndex(index);
+                    });
+                });
+
+                this.root.addEventListener('keydown', (e) => this.onKeyDown(e));
+            }
+
+            getLabel(value = this._value) {
+                return this.options.find(option => option.value === value)?.label || '';
+            }
+
+            setValue(nextValue, triggerChange = true) {
+                if (!this.hasOption(nextValue)) return;
+                this._value = nextValue;
+                this.updateUI(triggerChange);
+            }
+
+            updateUI(triggerChange = true) {
+                this.valueEl.textContent = this.getLabel();
+                this.optionEls.forEach(optionEl => {
+                    const selected = optionEl.dataset.value === this._value;
+                    optionEl.classList.toggle('selected', selected);
+                    optionEl.setAttribute('aria-selected', selected ? 'true' : 'false');
+                });
+                if (triggerChange) {
+                    this.root.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+
+            setFocusedIndex(index) {
+                this.focusIndex = index;
+                this.optionEls.forEach((optionEl, i) => {
+                    optionEl.classList.toggle('focused', i === index);
+                });
+            }
+
+            openMenu() {
+                customSelects.forEach(select => {
+                    if (select !== this) select.close();
+                });
+                this.open = true;
+                this.root.classList.add('open');
+                this.menu.classList.remove('hidden');
+                this.trigger.setAttribute('aria-expanded', 'true');
+                const selectedIndex = this.optionEls.findIndex(optionEl => optionEl.dataset.value === this._value);
+                this.setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+            }
+
+            close() {
+                this.open = false;
+                this.root.classList.remove('open');
+                this.menu.classList.add('hidden');
+                this.trigger.setAttribute('aria-expanded', 'false');
+                this.setFocusedIndex(-1);
+            }
+
+            toggle() {
+                if (this.open) {
+                    this.close();
+                } else {
+                    this.openMenu();
+                }
+            }
+
+            onKeyDown(e) {
+                if (!this.open && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    this.openMenu();
+                    return;
+                }
+
+                if (!this.open) return;
+
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    this.close();
+                    this.trigger.focus();
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.setFocusedIndex(Math.min(this.focusIndex + 1, this.optionEls.length - 1));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.setFocusedIndex(Math.max(this.focusIndex - 1, 0));
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    this.setFocusedIndex(0);
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    this.setFocusedIndex(this.optionEls.length - 1);
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (this.focusIndex >= 0) {
+                        this.setValue(this.optionEls[this.focusIndex].dataset.value);
+                        this.close();
+                        this.trigger.focus();
+                    }
+                }
+            }
+        }
+
+        function initCustomSelect(root, options, defaultValue) {
+            const select = new CustomSelect(root, options, defaultValue);
+            customSelects.push(select);
+            return select;
+        }
+
+        class CustomSlider {
+            constructor(root, { min = 1, max = 100, value = 90, step = 1 } = {}) {
+                this.root = root;
+                this.min = min;
+                this.max = max;
+                this.step = step;
+                this._value = value;
+                this.dragging = false;
+                this.render();
+                this.bind();
+                this.updateUI(false);
+            }
+
+            get value() {
+                return this._value;
+            }
+
+            set value(nextValue) {
+                this.setValue(nextValue, false);
+            }
+
+            clamp(value) {
+                return Math.min(this.max, Math.max(this.min, value));
+            }
+
+            snap(value) {
+                const stepped = Math.round((this.clamp(value) - this.min) / this.step) * this.step + this.min;
+                return this.clamp(stepped);
+            }
+
+            setValue(nextValue, triggerInput = true) {
+                this._value = this.snap(nextValue);
+                this.updateUI(triggerInput);
+            }
+
+            getPercent() {
+                return ((this._value - this.min) / (this.max - this.min)) * 100;
+            }
+
+            render() {
+                this.root.innerHTML = `
+                    <div class="custom-slider-track">
+                        <div class="custom-slider-range"></div>
+                        <div class="custom-slider-thumb" tabindex="-1" aria-hidden="true"></div>
+                    </div>
+                `;
+                this.track = this.root.querySelector('.custom-slider-track');
+                this.range = this.root.querySelector('.custom-slider-range');
+                this.thumb = this.root.querySelector('.custom-slider-thumb');
+            }
+
+            bind() {
+                this.track.addEventListener('pointerdown', (e) => this.onPointerDown(e));
+                this.root.addEventListener('keydown', (e) => this.onKeyDown(e));
+            }
+
+            updateUI(triggerInput = true) {
+                const percent = this.getPercent();
+                this.range.style.width = `${percent}%`;
+                this.thumb.style.left = `${percent}%`;
+                this.root.setAttribute('aria-valuenow', String(this._value));
+
+                if (triggerInput) {
+                    this.root.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+
+            valueFromClientX(clientX) {
+                const rect = this.track.getBoundingClientRect();
+                if (rect.width <= 0) return this._value;
+                const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+                return this.min + ratio * (this.max - this.min);
+            }
+
+            onPointerDown(e) {
+                if (e.button !== 0) return;
+                e.preventDefault();
+                this.dragging = true;
+                this.root.classList.add('dragging');
+                this.setValue(this.valueFromClientX(e.clientX));
+
+                const onMove = (moveEvent) => {
+                    this.setValue(this.valueFromClientX(moveEvent.clientX));
+                };
+
+                const onUp = () => {
+                    this.dragging = false;
+                    this.root.classList.remove('dragging');
+                    this.root.dispatchEvent(new Event('change', { bubbles: true }));
+                    window.removeEventListener('pointermove', onMove);
+                    window.removeEventListener('pointerup', onUp);
+                };
+
+                window.addEventListener('pointermove', onMove);
+                window.addEventListener('pointerup', onUp);
+            }
+
+            onKeyDown(e) {
+                let nextValue = this._value;
+
+                if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    nextValue = this._value + this.step;
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    nextValue = this._value - this.step;
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    nextValue = this.min;
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    nextValue = this.max;
+                } else {
+                    return;
+                }
+
+                this.setValue(nextValue);
+                this.root.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+
+        function initCustomSlider(root, options) {
+            return new CustomSlider(root, options);
+        }
+
+        document.addEventListener('click', () => {
+            customSelects.forEach(select => select.close());
+        });
+
+        const STORAGE_KEY = 'imageConverterFormats';
+        const THEME_STORAGE_KEY = 'imageConverterTheme';
+        const themeLightBtn = document.getElementById('themeLightBtn');
+        const themeDarkBtn = document.getElementById('themeDarkBtn');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const convertOnlyBtn = document.getElementById('convertOnlyBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const progress = document.getElementById('progress');
+        const selectActions = document.getElementById('selectActions');
+        const resultsCard = document.getElementById('resultsCard');
+        const resultsList = document.getElementById('resultsList');
+        const acceptHint = document.getElementById('acceptHint');
+        let selectedFiles = [];
+        let previewUrls = [];
+        let pendingDownloads = [];
+        const conversionResults = new Map();
+
+        const fromFormatRoot = document.getElementById('fromFormat');
+        const toFormatRoot = document.getElementById('toFormat');
+        const fromFormat = initCustomSelect(fromFormatRoot, FORMAT_OPTIONS, 'image/png');
+        const toFormat = initCustomSelect(toFormatRoot, FORMAT_OPTIONS, 'image/webp');
+        const maxSize = document.getElementById('maxSize');
+        const qualityRoot = document.getElementById('quality');
+        const quality = initCustomSlider(qualityRoot, { min: 1, max: 100, value: 90, step: 1 });
+        const qualityValue = document.getElementById('qualityValue');
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        function formatLabel(mime) {
+            return mime.split('/')[1].toUpperCase();
+        }
+
+        function getThemeColor(theme) {
+            return theme === 'dark' ? '#0a1510' : '#15803d';
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            localStorage.setItem(THEME_STORAGE_KEY, theme);
+
+            themeLightBtn.classList.toggle('active', theme === 'light');
+            themeDarkBtn.classList.toggle('active', theme === 'dark');
+            themeLightBtn.setAttribute('aria-pressed', theme === 'light');
+            themeDarkBtn.setAttribute('aria-pressed', theme === 'dark');
+
+            const themeColor = getThemeColor(theme);
+            document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
+            document.querySelector('meta[name="msapplication-TileColor"]')?.setAttribute('content', themeColor);
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem(THEME_STORAGE_KEY);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+            applyTheme(theme);
+        }
+
+        themeLightBtn.addEventListener('click', () => applyTheme('light'));
+        themeDarkBtn.addEventListener('click', () => applyTheme('dark'));
+        initTheme();
+
+        const clearCacheBtn = document.getElementById('clearCacheBtn');
+
+        async function clearServiceWorkerCache() {
+            clearCacheBtn.disabled = true;
+
+            try {
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                }
+
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(registration => registration.unregister()));
+                }
+
+                alert('Cache cleared. The page will reload with fresh content.');
+                window.location.reload();
+            } catch (error) {
+                console.error('Failed to clear cache:', error);
+                alert('Failed to clear cache. Please try again.');
+                clearCacheBtn.disabled = false;
+            }
+        }
+
+        clearCacheBtn.addEventListener('click', clearServiceWorkerCache);
+
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+        function getConvertedFileName(file) {
+            const extension = toFormat.value.split('/')[1];
+            return file.name.substring(0, file.name.lastIndexOf('.')) + '.' + extension;
+        }
+
+        function updateUploadActions() {
+            const hasFiles = selectedFiles.length > 0;
+            convertOnlyBtn.disabled = !hasFiles;
+            convertBtn.disabled = !hasFiles;
+        }
+
+        function resetPendingDownload() {
+            pendingDownloads = [];
+            downloadBtn.classList.add('hidden');
+        }
+
+        function saveFormats() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                from: fromFormat.value,
+                to: toFormat.value
+            }));
+        }
+
+        function loadSavedFormats() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                if (saved?.from && fromFormat.hasOption(saved.from)) {
+                    fromFormat.value = saved.from;
+                }
+                if (saved?.to && toFormat.hasOption(saved.to)) {
+                    toFormat.value = saved.to;
+                }
+            } catch (_) {}
+            updateAcceptHint();
+            fileInput.accept = fromFormat.value;
+        }
+
+        function updateAcceptHint() {
+            acceptHint.textContent = `Accepts ${formatLabel(fromFormat.value)} files`;
+        }
+
+        loadSavedFormats();
+
+        qualityRoot.addEventListener('input', () => {
+            qualityValue.textContent = `${quality.value}%`;
+        });
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+            fileInput.value = '';
+        });
+
+        fromFormatRoot.addEventListener('change', () => {
+            saveFormats();
+            fileInput.accept = fromFormat.value;
+            updateAcceptHint();
+            selectedFiles = [];
+            conversionResults.clear();
+            resetPendingDownload();
+            updatePreview();
+            updateResults();
+            updateUploadActions();
+            selectActions.classList.add('hidden');
+        });
+
+        toFormatRoot.addEventListener('change', () => {
+            saveFormats();
+            conversionResults.clear();
+            resetPendingDownload();
+            updatePreview();
+            updateResults();
+        });
+
+        function handleFiles(files) {
+            const selectedFormat = fromFormat.value;
+            const validFiles = Array.from(files).filter(file => file.type === selectedFormat);
+            if (validFiles.length !== files.length) {
+                alert(`Please select only ${formatLabel(selectedFormat)} files`);
+            }
+            selectedFiles = [...selectedFiles, ...validFiles];
+            resetPendingDownload();
+            updatePreview();
+            updateUploadActions();
+            selectActions.classList.toggle('hidden', selectedFiles.length === 0);
+        }
+
+        function getSizeMeta(index) {
+            const file = selectedFiles[index];
+            const result = conversionResults.get(index);
+            const original = formatFileSize(file.size);
+            if (!result) {
+                return `<div class="preview-size">${original}</div>`;
+            }
+            const savings = file.size > result.convertedSize
+                ? ` (−${Math.round((1 - result.convertedSize / file.size) * 100)}%)`
+                : '';
+            return `
+                <div class="preview-size">${original} → ${formatFileSize(result.convertedSize)}${savings}</div>
+                <div class="preview-size converted">Converted</div>
+            `;
+        }
+
+        function updatePreview() {
+            preview.innerHTML = '';
+            previewUrls = new Array(selectedFiles.length);
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewUrls[index] = e.target.result;
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.dataset.index = index;
+                    div.innerHTML = `
+                        <input type="checkbox" class="preview-checkbox select-image" data-index="${index}">
+                        <img src="${e.target.result}" alt="${file.name}" data-index="${index}">
+                        <div class="preview-actions">
+                            <button class="btn btn-success btn-icon btn-sm" type="button" title="Convert & download" onclick="convertAndDownloadSingle(${index})">
+                                ${icon('download', 14)}
+                            </button>
+                            <button class="btn btn-destructive btn-icon btn-sm" type="button" title="Remove" onclick="removeFile(${index})">
+                                ${icon('x', 14)}
+                            </button>
+                        </div>
+                        <div class="preview-meta">
+                            <div class="preview-name" title="${file.name}">${file.name}</div>
+                            ${getSizeMeta(index)}
+                        </div>
+                    `;
+                    div.querySelector('img').addEventListener('click', () => openGallery(index));
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function refreshPreviewMeta(index) {
+            const item = preview.querySelector(`.preview-item[data-index="${index}"]`);
+            if (!item) return;
+            const meta = item.querySelector('.preview-meta');
+            const file = selectedFiles[index];
+            meta.innerHTML = `
+                <div class="preview-name" title="${file.name}">${file.name}</div>
+                ${getSizeMeta(index)}
+            `;
+        }
+
+        function recordConversion(index, convertedSize) {
+            conversionResults.set(index, { convertedSize });
+            refreshPreviewMeta(index);
+            updateResults();
+        }
+
+        function updateResults() {
+            if (conversionResults.size === 0) {
+                resultsCard.classList.add('hidden');
+                resultsList.innerHTML = '';
+                return;
+            }
+
+            resultsCard.classList.remove('hidden');
+            resultsList.innerHTML = '';
+
+            conversionResults.forEach((result, index) => {
+                const file = selectedFiles[index];
+                if (!file) return;
+
+                const before = formatFileSize(file.size);
+                const after = formatFileSize(result.convertedSize);
+                const savings = file.size > result.convertedSize
+                    ? `<span class="result-savings">−${Math.round((1 - result.convertedSize / file.size) * 100)}%</span>`
+                    : '';
+
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.innerHTML = `
+                    <span class="result-name" title="${file.name}">${file.name}</span>
+                    <span class="result-sizes">
+                        ${before}
+                        <span class="arrow">→</span>
+                        <span class="after">${after}</span>
+                        ${savings}
+                    </span>
+                `;
+                resultsList.appendChild(item);
+            });
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            conversionResults.clear();
+            resetPendingDownload();
+            updatePreview();
+            updateResults();
+            updateUploadActions();
+            selectActions.classList.toggle('hidden', selectedFiles.length === 0);
+        }
+
+        async function convertAndDownloadSingle(index) {
+            const file = selectedFiles[index];
+            try {
+                const { blob, originalSize, convertedSize } = await convertImage(file);
+                recordConversion(index, convertedSize);
+                downloadSingleFile(blob, getConvertedFileName(file));
+            } catch (error) {
+                console.error('Conversion failed:', error);
+                alert('Conversion failed. Please try again.');
+            }
+        }
+
+        function downloadSingleFile(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function convertAllFiles() {
+            const downloads = [];
+            for (let index = 0; index < selectedFiles.length; index++) {
+                const file = selectedFiles[index];
+                const { blob, convertedSize } = await convertImage(file);
+                recordConversion(index, convertedSize);
+                downloads.push({ blob, fileName: getConvertedFileName(file) });
+            }
+            return downloads;
+        }
+
+        function downloadConvertedFiles(downloads) {
+            if (downloads.length === 1) {
+                downloadSingleFile(downloads[0].blob, downloads[0].fileName);
+                return;
+            }
+
+            const zip = new JSZip();
+            downloads.forEach(({ blob, fileName }) => zip.file(fileName, blob));
+            return zip.generateAsync({ type: 'blob' }).then(downloadZip);
+        }
+
+        convertOnlyBtn.addEventListener('click', async () => {
+            progress.classList.add('active');
+            convertOnlyBtn.disabled = true;
+            convertBtn.disabled = true;
+
+            try {
+                pendingDownloads = await convertAllFiles();
+                downloadBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error('Conversion failed:', error);
+                alert('Conversion failed. Please try again.');
+            }
+
+            progress.classList.remove('active');
+            updateUploadActions();
+        });
+
+        downloadBtn.addEventListener('click', async () => {
+            if (pendingDownloads.length === 0) return;
+
+            downloadBtn.disabled = true;
+            try {
+                await downloadConvertedFiles(pendingDownloads);
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed. Please try again.');
+            }
+            downloadBtn.disabled = false;
+        });
+
+        convertBtn.addEventListener('click', async () => {
+            progress.classList.add('active');
+            convertOnlyBtn.disabled = true;
+            convertBtn.disabled = true;
+
+            try {
+                const downloads = await convertAllFiles();
+                pendingDownloads = downloads;
+                await downloadConvertedFiles(downloads);
+                downloadBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error('Conversion failed:', error);
+                alert('Conversion failed. Please try again.');
+            }
+
+            progress.classList.remove('active');
+            updateUploadActions();
+        });
+
+        async function convertImage(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onerror = () => reject(new Error('Failed to load image'));
+
+                img.onload = async () => {
+                    let currentQuality = quality.value / 100;
+                    let canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
+
+                    let width = img.width;
+                    let height = img.height;
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    if (toFormat.value === 'image/jpeg') {
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, width, height);
+                    }
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    let blob = await new Promise(r => canvas.toBlob(r, toFormat.value, currentQuality));
+
+                    while (blob.size > maxSize.value * 1024 && currentQuality > 0.1) {
+                        currentQuality -= 0.1;
+                        width *= 0.9;
+                        height *= 0.9;
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        if (toFormat.value === 'image/jpeg') {
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(0, 0, width, height);
+                        }
+
+                        ctx.drawImage(img, 0, 0, width, height);
+                        blob = await new Promise(r => canvas.toBlob(r, toFormat.value, currentQuality));
+                    }
+
+                    URL.revokeObjectURL(img.src);
+                    resolve({
+                        blob,
+                        originalSize: file.size,
+                        convertedSize: blob.size
+                    });
+                };
+
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function downloadZip(blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const fromExt = fromFormat.value.split('/')[1];
+            const toExt = toFormat.value.split('/')[1];
+            a.download = `converted-${fromExt}-to-${toExt}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function selectAllImages() {
+            document.querySelectorAll('.select-image').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            document.getElementById('convertSelectedBtn').disabled = false;
+        }
+
+        function deselectAllImages() {
+            document.querySelectorAll('.select-image').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('convertSelectedBtn').disabled = true;
+        }
+
+        function getSelectedIndexes() {
+            return Array.from(document.querySelectorAll('.select-image:checked'))
+                .map(checkbox => parseInt(checkbox.dataset.index));
+        }
+
+        async function convertSelected() {
+            const indexes = getSelectedIndexes();
+            if (indexes.length === 0) return;
+
+            progress.classList.add('active');
+            document.getElementById('convertSelectedBtn').disabled = true;
+
+            try {
+                if (indexes.length === 1) {
+                    const index = indexes[0];
+                    const { blob, convertedSize } = await convertImage(selectedFiles[index]);
+                    recordConversion(index, convertedSize);
+                    downloadSingleFile(blob, getConvertedFileName(selectedFiles[index]));
+                } else {
+                    const zip = new JSZip();
+                    const promises = indexes.map(async (index) => {
+                        const file = selectedFiles[index];
+                        const { blob, convertedSize } = await convertImage(file);
+                        recordConversion(index, convertedSize);
+                        zip.file(getConvertedFileName(file), blob);
+                    });
+
+                    await Promise.all(promises);
+                    const zipBlob = await zip.generateAsync({ type: 'blob' });
+                    downloadZip(zipBlob);
+                }
+            } catch (error) {
+                console.error('Conversion failed:', error);
+                alert('Conversion failed. Please try again.');
+            }
+
+            progress.classList.remove('active');
+            document.getElementById('convertSelectedBtn').disabled = false;
+        }
+
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('select-image')) {
+                const hasChecked = document.querySelector('.select-image:checked');
+                document.getElementById('convertSelectedBtn').disabled = !hasChecked;
+            }
+        });
+
+        const galleryDialog = document.getElementById('galleryDialog');
+        const galleryBackdrop = document.getElementById('galleryBackdrop');
+        const galleryImage = document.getElementById('galleryImage');
+        const galleryImageWrap = document.getElementById('galleryImageWrap');
+        const galleryViewport = document.getElementById('galleryViewport');
+        const galleryCounter = document.getElementById('galleryCounter');
+        const galleryTitle = document.getElementById('galleryTitle');
+        const galleryPrevBtn = document.getElementById('galleryPrevBtn');
+        const galleryNextBtn = document.getElementById('galleryNextBtn');
+        const galleryCloseBtn = document.getElementById('galleryCloseBtn');
+        const galleryZoomInBtn = document.getElementById('galleryZoomInBtn');
+        const galleryZoomOutBtn = document.getElementById('galleryZoomOutBtn');
+        const galleryResetZoomBtn = document.getElementById('galleryResetZoomBtn');
+
+        let galleryIndex = 0;
+        let galleryScale = 1;
+        let galleryTranslateX = 0;
+        let galleryTranslateY = 0;
+        let galleryPinchStartDistance = 0;
+        let galleryPinchStartScale = 1;
+        let galleryPanStart = null;
+        let gallerySwipeStart = null;
+        let galleryLastTap = 0;
+
+        const GALLERY_MIN_SCALE = 1;
+        const GALLERY_MAX_SCALE = 5;
+        const GALLERY_SWIPE_THRESHOLD = 60;
+
+        function clampGalleryScale(value) {
+            return Math.min(GALLERY_MAX_SCALE, Math.max(GALLERY_MIN_SCALE, value));
+        }
+
+        function getTouchDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.hypot(dx, dy);
+        }
+
+        function resetGalleryTransform() {
+            galleryScale = 1;
+            galleryTranslateX = 0;
+            galleryTranslateY = 0;
+            applyGalleryTransform();
+        }
+
+        function applyGalleryTransform() {
+            galleryImageWrap.style.transform = `translate(${galleryTranslateX}px, ${galleryTranslateY}px) scale(${galleryScale})`;
+            galleryViewport.classList.toggle('can-pan', galleryScale > 1);
+        }
+
+        function setGalleryZoom(nextScale, focalX, focalY) {
+            const prevScale = galleryScale;
+            galleryScale = clampGalleryScale(nextScale);
+
+            if (galleryScale === 1) {
+                galleryTranslateX = 0;
+                galleryTranslateY = 0;
+            } else if (focalX != null && focalY != null && prevScale !== galleryScale) {
+                const rect = galleryViewport.getBoundingClientRect();
+                const originX = focalX - rect.left - rect.width / 2 - galleryTranslateX;
+                const originY = focalY - rect.top - rect.height / 2 - galleryTranslateY;
+                const ratio = galleryScale / prevScale;
+                galleryTranslateX -= originX * (ratio - 1);
+                galleryTranslateY -= originY * (ratio - 1);
+            }
+
+            applyGalleryTransform();
+        }
+
+        function updateGalleryUI() {
+            const file = selectedFiles[galleryIndex];
+            const url = previewUrls[galleryIndex];
+            if (!file || !url) return;
+
+            galleryImage.src = url;
+            galleryImage.alt = file.name;
+            galleryTitle.textContent = file.name;
+            galleryCounter.textContent = `${galleryIndex + 1} / ${selectedFiles.length}`;
+            galleryPrevBtn.disabled = galleryIndex === 0;
+            galleryNextBtn.disabled = galleryIndex === selectedFiles.length - 1;
+        }
+
+        function openGallery(index) {
+            if (!previewUrls[index]) return;
+            galleryIndex = index;
+            resetGalleryTransform();
+            updateGalleryUI();
+            galleryDialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            galleryCloseBtn.focus();
+        }
+
+        function closeGallery() {
+            galleryDialog.classList.add('hidden');
+            document.body.style.overflow = '';
+            galleryImage.src = '';
+            resetGalleryTransform();
+        }
+
+        function showGalleryImage(index) {
+            if (index < 0 || index >= selectedFiles.length || !previewUrls[index]) return;
+            galleryIndex = index;
+            resetGalleryTransform();
+            updateGalleryUI();
+        }
+
+        function toggleGalleryZoom(clientX, clientY) {
+            if (galleryScale > 1) {
+                resetGalleryTransform();
+            } else {
+                setGalleryZoom(2.5, clientX, clientY);
+            }
+        }
+
+        galleryCloseBtn.addEventListener('click', closeGallery);
+        galleryBackdrop.addEventListener('click', closeGallery);
+        galleryPrevBtn.addEventListener('click', () => showGalleryImage(galleryIndex - 1));
+        galleryNextBtn.addEventListener('click', () => showGalleryImage(galleryIndex + 1));
+        galleryZoomInBtn.addEventListener('click', () => {
+            const rect = galleryViewport.getBoundingClientRect();
+            setGalleryZoom(galleryScale + 0.5, rect.left + rect.width / 2, rect.top + rect.height / 2);
+        });
+        galleryZoomOutBtn.addEventListener('click', () => {
+            const rect = galleryViewport.getBoundingClientRect();
+            setGalleryZoom(galleryScale - 0.5, rect.left + rect.width / 2, rect.top + rect.height / 2);
+        });
+        galleryResetZoomBtn.addEventListener('click', resetGalleryTransform);
+
+        galleryImageWrap.addEventListener('dblclick', (e) => {
+            toggleGalleryZoom(e.clientX, e.clientY);
+        });
+
+        galleryViewport.addEventListener('wheel', (e) => {
+            if (galleryDialog.classList.contains('hidden')) return;
+            e.preventDefault();
+            setGalleryZoom(galleryScale + (e.deltaY < 0 ? 0.15 : -0.15), e.clientX, e.clientY);
+        }, { passive: false });
+
+        galleryViewport.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            galleryImageWrap.classList.add('no-transition');
+
+            if (galleryScale > 1) {
+                galleryPanStart = {
+                    pointerId: e.pointerId,
+                    x: e.clientX,
+                    y: e.clientY,
+                    translateX: galleryTranslateX,
+                    translateY: galleryTranslateY
+                };
+                galleryViewport.classList.add('is-dragging');
+                galleryViewport.setPointerCapture(e.pointerId);
+            } else {
+                gallerySwipeStart = {
+                    pointerId: e.pointerId,
+                    x: e.clientX,
+                    y: e.clientY
+                };
+                galleryViewport.setPointerCapture(e.pointerId);
+            }
+        });
+
+        galleryViewport.addEventListener('pointermove', (e) => {
+            if (galleryPanStart?.pointerId === e.pointerId) {
+                galleryTranslateX = galleryPanStart.translateX + (e.clientX - galleryPanStart.x);
+                galleryTranslateY = galleryPanStart.translateY + (e.clientY - galleryPanStart.y);
+                applyGalleryTransform();
+            }
+        });
+
+        galleryViewport.addEventListener('pointerup', (e) => {
+            galleryImageWrap.classList.remove('no-transition');
+            galleryViewport.classList.remove('is-dragging');
+
+            if (gallerySwipeStart?.pointerId === e.pointerId && galleryScale === 1) {
+                const deltaX = e.clientX - gallerySwipeStart.x;
+                const deltaY = e.clientY - gallerySwipeStart.y;
+                if (Math.abs(deltaX) > GALLERY_SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    showGalleryImage(galleryIndex + (deltaX < 0 ? 1 : -1));
+                }
+            }
+
+            if (galleryPanStart?.pointerId === e.pointerId) {
+                galleryPanStart = null;
+            }
+            if (gallerySwipeStart?.pointerId === e.pointerId) {
+                gallerySwipeStart = null;
+            }
+
+            if (galleryViewport.hasPointerCapture(e.pointerId)) {
+                galleryViewport.releasePointerCapture(e.pointerId);
+            }
+        });
+
+        galleryViewport.addEventListener('pointercancel', (e) => {
+            galleryImageWrap.classList.remove('no-transition');
+            galleryViewport.classList.remove('is-dragging');
+            galleryPanStart = null;
+            gallerySwipeStart = null;
+        });
+
+        galleryViewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                galleryPinchStartDistance = getTouchDistance(e.touches);
+                galleryPinchStartScale = galleryScale;
+                galleryPanStart = null;
+                gallerySwipeStart = null;
+                galleryImageWrap.classList.add('no-transition');
+            } else if (e.touches.length === 1) {
+                const now = Date.now();
+                if (now - galleryLastTap < 300) {
+                    e.preventDefault();
+                    toggleGalleryZoom(e.touches[0].clientX, e.touches[0].clientY);
+                    galleryLastTap = 0;
+                } else {
+                    galleryLastTap = now;
+                }
+            }
+        }, { passive: false });
+
+        galleryViewport.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const distance = getTouchDistance(e.touches);
+                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const nextScale = galleryPinchStartScale * (distance / galleryPinchStartDistance);
+                setGalleryZoom(nextScale, midX, midY);
+            }
+        }, { passive: false });
+
+        galleryViewport.addEventListener('touchend', () => {
+            galleryImageWrap.classList.remove('no-transition');
+            galleryPinchStartDistance = 0;
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (galleryDialog.classList.contains('hidden')) return;
+
+            if (e.key === 'Escape') {
+                closeGallery();
+            } else if (e.key === 'ArrowLeft') {
+                showGalleryImage(galleryIndex - 1);
+            } else if (e.key === 'ArrowRight') {
+                showGalleryImage(galleryIndex + 1);
+            } else if (e.key === '+' || e.key === '=') {
+                const rect = galleryViewport.getBoundingClientRect();
+                setGalleryZoom(galleryScale + 0.25, rect.left + rect.width / 2, rect.top + rect.height / 2);
+            } else if (e.key === '-') {
+                const rect = galleryViewport.getBoundingClientRect();
+                setGalleryZoom(galleryScale - 0.25, rect.left + rect.width / 2, rect.top + rect.height / 2);
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log('ServiceWorker registered'))
+                    .catch(error => console.log('ServiceWorker registration failed:', error));
+            });
+        }
+    </script>
+</body>
+</html>
