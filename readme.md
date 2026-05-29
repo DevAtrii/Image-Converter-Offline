@@ -1,29 +1,73 @@
-# Image Converter
+# Image Converter & Resizer
 
 **Live:** [atrii.dev](https://atrii.dev) · **GitHub Pages:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/)
 
-A fast, privacy-first image converter that runs entirely in your browser. Convert between WebP, PNG, JPEG, and GIF without uploading files to a server.
+A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize images, rotate, flip, and batch export — with no uploads and no server processing.
 
-## Features
+## Tools
+
+| Tool | Page | Description |
+|------|------|-------------|
+| **Image Converter** | [`index.html`](index.html) | Convert between WebP, PNG, JPEG, and GIF |
+| **Image Resizer** | [`resizer.html`](resizer.html) | Resize by pixels or percentage, rotate, flip, and export |
+
+Both tools share the same two-pane layout: **settings on the left**, **images on the right**.
+
+---
+
+## Image Converter
+
+Convert images between WebP, PNG, JPEG, and GIF with full control over quality and output size.
+
+### Features
 
 - **100% offline** — all conversion happens locally in the browser
-- **Batch conversion** — convert multiple images at once, download as ZIP
-- **Format support** — WebP, PNG, JPEG, GIF (any-to-any)
-- **Quality & size controls** — adjust quality slider and max output size (KB)
+- **Batch conversion** — convert multiple images at once, download as a ZIP
+- **Any-to-any formats** — WebP, PNG, JPEG, GIF
+- **Quality & size controls** — quality slider and max output size (KB)
 - **Before / after sizes** — see file size savings after conversion
-- **Gallery preview** — tap an image to open full-screen view with pinch-to-zoom, pan, and swipe
+- **Gallery preview** — full-screen view with pinch-to-zoom, pan, and swipe
 - **Convert or Convert & Download** — preview results before downloading
 - **Remembers settings** — last selected source/target formats saved in `localStorage`
-- **Light & dark mode** — green-themed UI with theme toggle in footer
+- **Override on drop** — automatically switch source format when you drop a different file type
+
+---
+
+## Image Resizer
+
+Resize, rotate, and flip images before export — ideal for batch prep and quick dimension changes.
+
+### Features
+
+- **Resize by size** — set width and/or height in pixels (aspect ratio preserved when one field is empty)
+- **Resize by percentage** — scale from 1% to 200% with a slider
+- **Per-image transforms** — rotate 90° and flip horizontal/vertical with live preview
+- **Export formats** — PNG, WebP, JPEG, GIF, or **Same as Original** (keeps each file's type)
+- **Target file size** — optional max output size in KB (works best with JPEG and WebP)
+- **Batch export** — download single files or a ZIP
+- **Reset controls** — quick reset for dimension and scale settings
+
+---
+
+## Shared Features
+
+- **Privacy first** — files never leave your device
+- **Light & dark mode** — green-themed UI with theme toggle in the footer
 - **PWA ready** — service worker caches assets for offline use
-- **Clear cache** — one-click reset of service worker and cached pages
+- **Clear cache** — one-click reset of service worker and cached pages after updates
+- **Responsive layout** — sidebar + main panel on desktop, stacked on mobile
 
-## Tech
+---
 
-- Vanilla HTML, CSS, and JavaScript — no build step
-- [Lucide](https://lucide.dev/) icons via [Iconify](https://iconify.design/)
-- [JSZip](https://stuk.github.io/jszip/) for batch ZIP downloads
-- Service worker for offline caching
+## Tech Stack
+
+- **Vanilla HTML, CSS, and JavaScript** — no build step, no framework
+- **[Lucide](https://lucide.dev/) icons** via [Iconify](https://iconify.design/)
+- **[JSZip](https://stuk.github.io/jszip/)** for batch ZIP downloads
+- **Canvas API** for image processing
+- **Service worker** for offline caching
+
+---
 
 ## Getting Started
 
@@ -34,7 +78,7 @@ A fast, privacy-first image converter that runs entirely in your browser. Conver
    cd Image-Converter-Offline
    ```
 
-2. Open `index.html` in a browser, or serve the folder with any static file server:
+2. Open `index.html` or `resizer.html` in a browser, or serve the folder locally:
 
    ```bash
    npx serve .
@@ -42,14 +86,27 @@ A fast, privacy-first image converter that runs entirely in your browser. Conver
 
 No install or build required.
 
+---
+
 ## Project Structure
 
 ```
-├── index.html      # App UI and conversion logic
-├── sw.js           # Service worker (offline cache)
-├── manifest.json   # PWA manifest
+├── index.html          # Image Converter page
+├── resizer.html        # Image Resizer page
+├── css/
+│   ├── shared.css      # Design system, layout, shared components
+│   ├── converter.css   # Converter-specific styles (gallery, etc.)
+│   └── resizer.css     # Resizer-specific styles (transforms, mode toggles)
+├── js/
+│   ├── shared.js       # Theme, custom selects/sliders, utilities, service worker
+│   ├── converter.js    # Conversion logic and gallery
+│   └── resizer.js      # Resize, rotate, flip, and export logic
+├── sw.js               # Service worker (offline cache)
+├── manifest.json       # PWA manifest
 └── readme.md
 ```
+
+---
 
 ## Deployment
 
@@ -69,16 +126,27 @@ The site is published at:
 
 To serve at a root domain (e.g. `atrii.dev`), point DNS to GitHub Pages and add the domain under **Settings → Pages → Custom domain**.
 
+---
+
 ## Service Worker
 
 Cache name and precached URLs are defined in `sw.js`:
 
 ```js
-const CACHE_NAME = 'atrii-image-converter-v2';
-const urlsToCache = ['/', '/index.html', '/manifest.json', ...];
+const CACHE_NAME = 'atrii-image-converter-v3';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/resizer.html',
+  '/manifest.json',
+  '/css/shared.css',
+  // ...
+];
 ```
 
-Use **Clear Cache** in the app footer to wipe caches and re-register the service worker after updates.
+After deploying an update, use **Clear Cache** in the app footer to wipe old caches and load the latest version.
+
+---
 
 ## License
 
