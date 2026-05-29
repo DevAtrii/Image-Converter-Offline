@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://devatrii.github.io/Image-Converter-Offline/sitemap.xml

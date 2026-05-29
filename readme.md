@@ -1,6 +1,6 @@
 # Image Converter & Resizer
 
-**Live:** [atrii.dev](https://atrii.dev) · **GitHub Pages:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/)
+**Live:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/) · **Resizer:** [resizer.html](https://devatrii.github.io/Image-Converter-Offline/resizer.html) · **Custom domain:** [atrii.dev](https://atrii.dev)
 
 A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize images, rotate, flip, and batch export — with no uploads and no server processing.
 
@@ -133,7 +133,7 @@ To serve at a root domain (e.g. `atrii.dev`), point DNS to GitHub Pages and add 
 Cache name and precached URLs are defined in `sw.js`:
 
 ```js
-const CACHE_NAME = 'atrii-image-converter-v3';
+const CACHE_NAME = 'atrii-image-converter-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -145,6 +145,26 @@ const urlsToCache = [
 ```
 
 After deploying an update, use **Clear Cache** in the app footer to wipe old caches and load the latest version.
+
+---
+
+## SEO
+
+The site includes:
+
+- `robots.txt` and `sitemap.xml` for crawlers
+- Unique titles, meta descriptions, and canonical URLs per page
+- Open Graph and Twitter Card tags
+- JSON-LD structured data (`WebApplication` + `FAQPage`)
+- Keyword-rich on-page content with internal links between tools
+
+**After deploy, submit to Google:**
+
+1. [Google Search Console](https://search.google.com/search-console) — add property `https://devatrii.github.io/Image-Converter-Offline/`
+2. Submit sitemap: `https://devatrii.github.io/Image-Converter-Offline/sitemap.xml`
+3. Request indexing for `/` and `/resizer.html`
+
+If you use a custom domain (`atrii.dev`), set it as the primary domain in Search Console and keep canonical URLs consistent.
 
 ---
 

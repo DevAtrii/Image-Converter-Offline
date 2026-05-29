@@ -1,10 +1,12 @@
 {
-  "name": "Image Converter",
-  "short_name": "ImgConvert",
-  "description": "Free online image converter",
-  "start_url": "/",
-  "scope": "/",
+  "name": "Image Converter & Resizer",
+  "short_name": "ImgTools",
+  "description": "Free offline image converter and resizer. Convert, resize, rotate, and flip images in your browser with no uploads.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f0fdf4",
-  "theme_color": "#15803d"
+  "theme_color": "#15803d",
+  "lang": "en",
+  "categories": ["photo", "utilities", "productivity"]
 }

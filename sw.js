@@ -1,9 +1,11 @@
-const CACHE_NAME = 'atrii-image-converter-v3';
+const CACHE_NAME = 'atrii-image-converter-v4';
 const urlsToCache = [
   '/',
   '/index.html',
   '/resizer.html',
   '/manifest.json',
+  '/robots.txt',
+  '/sitemap.xml',
   '/css/shared.css',
   '/css/converter.css',
   '/css/resizer.css',
