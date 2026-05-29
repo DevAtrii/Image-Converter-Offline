@@ -9,6 +9,8 @@ const heightInput = document.getElementById('heightInput');
 const percentSliderRoot = document.getElementById('percentSlider');
 const percentValue = document.getElementById('percentValue');
 const percentHint = document.getElementById('percentHint');
+const resetSizeBtn = document.getElementById('resetSizeBtn');
+const resetPercentBtn = document.getElementById('resetPercentBtn');
 const exportFormatRoot = document.getElementById('exportFormat');
 const targetSizeInput = document.getElementById('targetSize');
 const dropZone = document.getElementById('dropZone');
@@ -19,7 +21,7 @@ const progress = document.getElementById('progress');
 const exportOnlyBtn = document.getElementById('exportOnlyBtn');
 const exportBtn = document.getElementById('exportBtn');
 const downloadBtn = document.getElementById('downloadBtn');
-const mainContent = document.querySelector('.resizer-main-content');
+const mainContent = document.querySelector('.tool-main-content');
 
 const RESIZER_FORMAT_OPTIONS = [
     { value: 'original', label: 'Same as Original' },
@@ -188,6 +190,20 @@ function setResizeMode(mode) {
 
 function refreshPreviewDimensions() {
     selectedFiles.forEach((_, index) => refreshPreviewMeta(index));
+}
+
+function resetSizeSettings() {
+    widthInput.value = '';
+    heightInput.value = '';
+    saveSettings();
+    refreshPreviewDimensions();
+}
+
+function resetPercentSettings() {
+    percentSlider.value = 100;
+    updatePercentHint();
+    saveSettings();
+    refreshPreviewDimensions();
 }
 
 function handleFiles(files) {
@@ -488,6 +504,8 @@ async function exportSingle(index) {
 
 modeSizeBtn.addEventListener('click', () => setResizeMode('size'));
 modePercentBtn.addEventListener('click', () => setResizeMode('percent'));
+resetSizeBtn.addEventListener('click', resetSizeSettings);
+resetPercentBtn.addEventListener('click', resetPercentSettings);
 
 percentSliderRoot.addEventListener('input', () => {
     updatePercentHint();

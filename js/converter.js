@@ -1,8 +1,10 @@
 const STORAGE_KEY = 'imageConverterFormats';
 const OVERRIDE_ON_DROP_KEY = 'imageConverterOverrideOnDrop';
 const dropZone = document.getElementById('dropZone');
+const addImagesBtn = document.getElementById('addImagesBtn');
 const fileInput = document.getElementById('fileInput');
 const preview = document.getElementById('preview');
+const mainContent = document.querySelector('.tool-main-content');
 const convertOnlyBtn = document.getElementById('convertOnlyBtn');
 const convertBtn = document.getElementById('convertBtn');
 const downloadBtn = document.getElementById('downloadBtn');
@@ -35,6 +37,8 @@ function updateUploadActions() {
     const hasFiles = selectedFiles.length > 0;
     convertOnlyBtn.disabled = !hasFiles;
     convertBtn.disabled = !hasFiles;
+    dropZone.classList.toggle('has-images', hasFiles);
+    mainContent.classList.toggle('has-images', hasFiles);
 }
 
 function resetPendingDownload() {
@@ -114,6 +118,11 @@ qualityRoot.addEventListener('input', () => {
 });
 
 dropZone.addEventListener('click', () => fileInput.click());
+addImagesBtn.addEventListener('click', () => fileInput.click());
+
+function setMainDragover(active) {
+    mainContent.classList.toggle('is-dragover', active);
+}
 
 dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -126,7 +135,28 @@ dropZone.addEventListener('dragleave', () => {
 
 dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     dropZone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files, { fromDrop: true });
+});
+
+mainContent.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (selectedFiles.length > 0) {
+        setMainDragover(true);
+    }
+});
+
+mainContent.addEventListener('dragleave', (e) => {
+    if (!mainContent.contains(e.relatedTarget)) {
+        setMainDragover(false);
+    }
+});
+
+mainContent.addEventListener('drop', (e) => {
+    if (e.target.closest('#dropZone')) return;
+    e.preventDefault();
+    setMainDragover(false);
     handleFiles(e.dataTransfer.files, { fromDrop: true });
 });
 

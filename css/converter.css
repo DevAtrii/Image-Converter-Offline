@@ -171,3 +171,38 @@
                 display: none;
             }
         }
+
+.converter-format-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.converter-format-stack .format-flow-arrow {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  margin: 0.125rem 0;
+  border-radius: 9999px;
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+}
+
+.tool-sidebar .converter-controls-grid {
+  grid-template-columns: 1fr;
+}
+
+.converter-results-card {
+  margin-top: 1rem;
+}
+
+.converter-results-card .card-header {
+  padding-top: 1rem;
+}
+
+.select-actions {
+  margin-top: 1rem;
+}
