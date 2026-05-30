@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Offline Image Cropper — Crop Photos in Browser | No Upload</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+    <meta name="description" content="Crop images in your browser with aspect ratio presets. Batch crop PNG, WebP, JPEG, or GIF. Free, private, 100% offline — no upload required.">
+    <meta name="keywords" content="offline image cropper, crop image online free, crop photo browser, batch crop images, aspect ratio crop, crop png, crop webp, no upload">
+    <meta name="author" content="DevAtrii">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="googlebot" content="index, follow">
+    <link rel="canonical" href="https://devatrii.github.io/Image-Converter-Offline/crop.html">
+    <meta property="og:site_name" content="Image Converter &amp; Resizer">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Free Offline Image Cropper — Crop Photos in Browser">
+    <meta property="og:description" content="Crop images with aspect ratio presets in your browser. Batch export with no uploads.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devatrii.github.io/Image-Converter-Offline/crop.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Free Offline Image Cropper — Crop Photos in Browser">
+    <meta name="twitter:description" content="Crop images with aspect ratio presets in your browser. Free, offline, and private.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Offline Image Cropper",
+        "url": "https://devatrii.github.io/Image-Converter-Offline/crop.html",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "description": "Free offline image cropper with aspect ratio presets and batch ZIP export.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Crop with free or fixed aspect ratios",
+            "Per-image crop editor",
+            "Batch ZIP download",
+            "Export PNG, WebP, JPEG, GIF, or same as original",
+            "100% offline and private"
+        ],
+        "isAccessibleForFree": true,
+        "inLanguage": "en"
+    }
+    </script>
+    <meta name="theme-color" content="#15803d">
+    <meta name="msapplication-TileColor" content="#15803d">
+    <script>
+        (function () {
+            const key = 'imageConverterTheme';
+            const saved = localStorage.getItem(key);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
+    <link rel="preconnect" href="https://api.iconify.design">
+    <link rel="dns-prefetch" href="https://api.iconify.design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/crop.css">
+</head>
+<body>
+    <div class="container tool-page">
+        <nav class="tool-nav" aria-label="Tools">
+            <a href="index.html" class="tool-nav-link">
+                <iconify-icon icon="lucide:refresh-cw" width="14" height="14"></iconify-icon>
+                Converter
+            </a>
+            <a href="resizer.html" class="tool-nav-link">
+                <iconify-icon icon="lucide:scaling" width="14" height="14"></iconify-icon>
+                Resizer
+            </a>
+            <a href="crop.html" class="tool-nav-link active" aria-current="page">
+                <iconify-icon icon="lucide:crop" width="14" height="14"></iconify-icon>
+                Crop
+            </a>
+        </nav>
+
+        <header class="page-header tool-page-header">
+            <h1>Image Cropper</h1>
+            <p>Crop images instantly in your browser. Aspect ratio presets, per-image editing — PNG, WebP, JPEG, and GIF.</p>
+            <div class="badge-row">
+                <span class="badge">100% Offline</span>
+                <span class="badge">Batch Crop</span>
+                <span class="badge">Privacy First</span>
+            </div>
+        </header>
+
+        <div class="tool-workspace">
+            <aside class="tool-sidebar">
+                <div class="tool-sidebar-inner">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:crop" width="18" height="18"></iconify-icon>
+                                Crop Settings
+                            </h2>
+                            <p class="card-description">Choose an aspect ratio preset or crop freely per image.</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <span class="label label-icon">
+                                    <iconify-icon icon="lucide:ratio" width="14" height="14"></iconify-icon>
+                                    Aspect Ratio
+                                </span>
+                                <div class="aspect-grid" id="aspectGrid"></div>
+                            </div>
+                            <p class="settings-tip">
+                                <iconify-icon icon="lucide:info" width="14" height="14"></iconify-icon>
+                                <span>Changing ratio recenters the crop on all images. Click the crop icon on any image to fine-tune.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:file-output" width="18" height="18"></iconify-icon>
+                                Export Settings
+                            </h2>
+                            <p class="card-description">Choose output format and optional target file size.</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="controls-grid crop-export-grid">
+                                <div class="form-group">
+                                    <label class="label label-icon" id="exportFormatLabel">
+                                        <iconify-icon icon="lucide:file-image" width="14" height="14"></iconify-icon>
+                                        Save As
+                                    </label>
+                                    <div class="custom-select" id="exportFormat" role="combobox" aria-labelledby="exportFormatLabel" aria-haspopup="listbox"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" for="targetSize">
+                                        <iconify-icon icon="lucide:hard-drive" width="14" height="14"></iconify-icon>
+                                        Target File Size (KB)
+                                    </label>
+                                    <input class="input" type="number" id="targetSize" min="1" placeholder="Optional">
+                                    <p class="settings-tip">
+                                        <iconify-icon icon="lucide:info" width="14" height="14"></iconify-icon>
+                                        <span>Optional max output size. Works best with JPEG and WebP.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-actions">
+                        <button class="btn btn-secondary" type="button" id="exportOnlyBtn" disabled>
+                            <iconify-icon icon="lucide:refresh-cw" width="16" height="16"></iconify-icon>
+                            Export
+                        </button>
+                        <button class="btn btn-primary" type="button" id="exportBtn" disabled>
+                            <iconify-icon icon="lucide:download" width="16" height="16"></iconify-icon>
+                            Export &amp; Download
+                        </button>
+                        <button class="btn btn-success hidden" type="button" id="downloadBtn">
+                            <iconify-icon icon="lucide:folder-down" width="16" height="16"></iconify-icon>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="tool-main">
+                <div class="card tool-main-card">
+                    <div class="card-header tool-main-header">
+                        <div>
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:images" width="18" height="18"></iconify-icon>
+                                Images
+                            </h2>
+                            <p class="card-description">Drag and drop or browse PNG, WebP, JPEG, and GIF files.</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" type="button" id="addImagesBtn">
+                            <iconify-icon icon="lucide:plus" width="16" height="16"></iconify-icon>
+                            Add Images
+                        </button>
+                    </div>
+                    <div class="card-content tool-main-content">
+                        <div class="drop-zone tool-drop-zone" id="dropZone">
+                            <iconify-icon class="drop-zone-icon" icon="lucide:upload" width="40" height="40"></iconify-icon>
+                            <p><strong>Drop images here</strong></p>
+                            <p>or click to browse</p>
+                            <p class="hint">Accepts PNG, WebP, JPEG, and GIF</p>
+                            <input type="file" id="fileInput" hidden multiple accept="image/png,image/jpeg,image/webp,image/gif">
+                        </div>
+
+                        <div class="preview tool-preview" id="preview"></div>
+
+                        <div class="progress" id="progress">
+                            <div class="spinner"></div>
+                            <span>Processing images…</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <section class="seo-section" aria-labelledby="crop-seo-heading">
+            <h2 id="crop-seo-heading">Free offline image cropper — crop photos in your browser</h2>
+            <p>Crop images with <strong>aspect ratio presets</strong> (1:1, 4:3, 16:9, 9:16) or freeform cropping. Edit each image individually, then export as PNG, WebP, JPEG, or GIF.</p>
+            <div class="seo-columns">
+                <div>
+                    <h3>Also try</h3>
+                    <ul>
+                        <li><a href="index.html">Image Converter</a> — change formats</li>
+                        <li><a href="resizer.html">Image Resizer</a> — resize, rotate &amp; flip</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Use cases</h3>
+                    <ul>
+                        <li>Profile pictures and avatars (1:1)</li>
+                        <li>YouTube thumbnails (16:9)</li>
+                        <li>Instagram stories (9:16)</li>
+                        <li>Batch crop screenshots</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <iconify-icon icon="lucide:crop" width="18" height="18"></iconify-icon>
+                        Image Cropper
+                    </div>
+                    <p class="footer-brand-desc">
+                        Crop images instantly in your browser. Free, private, and fully offline — no uploads, no watermarks, no data collection.
+                    </p>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Features</h3>
+                    <ul class="footer-links">
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Aspect ratio presets</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Per-image crop editor</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Batch ZIP export</li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Settings</h3>
+                    <div class="footer-settings">
+                        <div>
+                            <div class="footer-setting-label">Appearance</div>
+                            <div class="theme-switcher" role="group" aria-label="Theme">
+                                <button class="theme-toggle-btn" type="button" id="themeLightBtn" aria-pressed="true" aria-label="Light mode">
+                                    <iconify-icon icon="lucide:sun" width="14" height="14"></iconify-icon>
+                                    <span>Light</span>
+                                </button>
+                                <button class="theme-toggle-btn" type="button" id="themeDarkBtn" aria-pressed="false" aria-label="Dark mode">
+                                    <iconify-icon icon="lucide:moon" width="14" height="14"></iconify-icon>
+                                    <span>Dark</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="footer-setting-label">Storage</div>
+                            <button class="footer-btn" type="button" id="clearCacheBtn">
+                                <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>
+                                Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Connect</h3>
+                    <div class="footer-social-links">
+                        <a href="https://github.com/DevAtrii/Image-Converter-Offline" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            <iconify-icon icon="lucide:github" width="16" height="16"></iconify-icon>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="footerYear"></span> Image Cropper. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="crop-dialog hidden" id="cropDialog" role="dialog" aria-modal="true" aria-label="Crop image">
+        <div class="crop-backdrop" id="cropBackdrop"></div>
+        <div class="crop-shell">
+            <div class="crop-toolbar">
+                <span class="crop-toolbar-title" id="cropTitle"></span>
+                <button class="btn btn-outline btn-icon btn-sm" type="button" id="cropCloseBtn" aria-label="Close">
+                    <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+                </button>
+            </div>
+            <div class="crop-stage" id="cropStage">
+                <img id="cropImage" alt="">
+                <div class="crop-box" id="cropBox">
+                    <div class="crop-handle crop-handle-se" data-handle="se"></div>
+                </div>
+            </div>
+            <div class="crop-footer">
+                <span class="crop-size-label" id="cropSizeLabel">0 × 0 px</span>
+                <div class="crop-footer-actions">
+                    <button class="btn btn-outline btn-sm" type="button" id="cropResetBtn">Reset</button>
+                    <button class="btn btn-primary btn-sm" type="button" id="cropApplyBtn">Apply Crop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/crop.js"></script>
+</body>
+</html>

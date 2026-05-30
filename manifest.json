@@ -1,7 +1,7 @@
 {
   "name": "Image Converter & Resizer",
   "short_name": "ImgTools",
-  "description": "Free offline image converter and resizer. Convert, resize, rotate, and flip images in your browser with no uploads.",
+  "description": "Free offline image converter, resizer, and cropper. Convert, resize, crop, rotate, and flip images in your browser with no uploads.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

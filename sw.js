@@ -1,17 +1,20 @@
-const CACHE_NAME = 'atrii-image-converter-v4';
+const CACHE_NAME = 'atrii-image-converter-v5';
 const urlsToCache = [
   '/',
   '/index.html',
   '/resizer.html',
+  '/crop.html',
   '/manifest.json',
   '/robots.txt',
   '/sitemap.xml',
   '/css/shared.css',
   '/css/converter.css',
   '/css/resizer.css',
+  '/css/crop.css',
   '/js/shared.js',
   '/js/converter.js',
   '/js/resizer.js',
+  '/js/crop.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'
 ];
 

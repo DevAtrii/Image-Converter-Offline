@@ -2,7 +2,7 @@
 
 **Live:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/) · **Resizer:** [resizer.html](https://devatrii.github.io/Image-Converter-Offline/resizer.html) · **Custom domain:** [atrii.dev](https://atrii.dev)
 
-A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize images, rotate, flip, and batch export — with no uploads and no server processing.
+A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize, crop, rotate, flip, and batch export — with no uploads and no server processing.
 
 ## Tools
 
@@ -10,6 +10,7 @@ A fast, privacy-first image toolkit that runs entirely in your browser. Convert 
 |------|------|-------------|
 | **Image Converter** | [`index.html`](index.html) | Convert between WebP, PNG, JPEG, and GIF |
 | **Image Resizer** | [`resizer.html`](resizer.html) | Resize by pixels or percentage, rotate, flip, and export |
+| **Image Cropper** | [`crop.html`](crop.html) | Crop with aspect ratio presets, per-image editor, batch export |
 
 Both tools share the same two-pane layout: **settings on the left**, **images on the right**.
 
@@ -46,6 +47,20 @@ Resize, rotate, and flip images before export — ideal for batch prep and quick
 - **Target file size** — optional max output size in KB (works best with JPEG and WebP)
 - **Batch export** — download single files or a ZIP
 - **Reset controls** — quick reset for dimension and scale settings
+
+---
+
+## Image Cropper
+
+Crop images with aspect ratio presets or freeform selection, then export in bulk.
+
+### Features
+
+- **Aspect ratios** — Free, 1:1, 4:3, 16:9, 3:2, 9:16
+- **Per-image crop editor** — drag to move, resize crop box with live dimensions
+- **Export formats** — PNG, WebP, JPEG, GIF, or Same as Original
+- **Target file size** — optional max output size in KB
+- **Batch export** — download single files or a ZIP
 
 ---
 
@@ -93,14 +108,17 @@ No install or build required.
 ```
 ├── index.html          # Image Converter page
 ├── resizer.html        # Image Resizer page
+├── crop.html           # Image Cropper page
 ├── css/
 │   ├── shared.css      # Design system, layout, shared components
 │   ├── converter.css   # Converter-specific styles (gallery, etc.)
-│   └── resizer.css     # Resizer-specific styles (transforms, mode toggles)
+│   ├── resizer.css     # Resizer-specific styles (transforms, mode toggles)
+│   └── crop.css        # Cropper-specific styles (crop dialog, aspect grid)
 ├── js/
 │   ├── shared.js       # Theme, custom selects/sliders, utilities, service worker
 │   ├── converter.js    # Conversion logic and gallery
-│   └── resizer.js      # Resize, rotate, flip, and export logic
+│   ├── resizer.js      # Resize, rotate, flip, and export logic
+│   └── crop.js         # Crop editor and export logic
 ├── sw.js               # Service worker (offline cache)
 ├── manifest.json       # PWA manifest
 └── readme.md
@@ -133,7 +151,7 @@ To serve at a root domain (e.g. `atrii.dev`), point DNS to GitHub Pages and add 
 Cache name and precached URLs are defined in `sw.js`:
 
 ```js
-const CACHE_NAME = 'atrii-image-converter-v4';
+const CACHE_NAME = 'atrii-image-converter-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -162,7 +180,7 @@ The site includes:
 
 1. [Google Search Console](https://search.google.com/search-console) — add property `https://devatrii.github.io/Image-Converter-Offline/`
 2. Submit sitemap: `https://devatrii.github.io/Image-Converter-Offline/sitemap.xml`
-3. Request indexing for `/` and `/resizer.html`
+3. Request indexing for `/`, `/resizer.html`, and `/crop.html`
 
 If you use a custom domain (`atrii.dev`), set it as the primary domain in Search Console and keep canonical URLs consistent.
 
