@@ -11,8 +11,9 @@ A fast, privacy-first image toolkit that runs entirely in your browser. Convert 
 | **Image Converter** | [`index.html`](index.html) | Convert between WebP, PNG, JPEG, and GIF |
 | **Image Resizer** | [`resizer.html`](resizer.html) | Resize by pixels or percentage, rotate, flip, and export |
 | **Image Cropper** | [`crop.html`](crop.html) | Crop with aspect ratio presets, per-image editor, batch export |
+| **Corner Rounder** | [`corners.html`](corners.html) | Round corners, add custom borders, and export |
 
-Both tools share the same two-pane layout: **settings on the left**, **images on the right**.
+All tools share the same two-pane layout: **settings on the left**, **images on the right**.
 
 ---
 
@@ -64,6 +65,23 @@ Crop images with aspect ratio presets or freeform selection, then export in bulk
 
 ---
 
+## Corner Rounder & Border Tool
+
+Round image corners with custom radius presets and add customizable borders before exporting.
+
+### Features
+
+- **Corner radius** — slider & numeric input (0px to 200px or 50% circle/pill)
+- **Presets** — 0px, 16px, 32px, 64px, and Full
+- **Individual corners** — select/toggle Top-Left, Top-Right, Bottom-Right, Bottom-Left
+- **Borders** — custom width, styles (solid, dashed, dotted, double), and color swatches
+- **Border position** — Outside Image (expand canvas) vs Inside Image
+- **Background fill** — Transparent or solid color for JPEG/custom canvas fill
+- **Export formats** — PNG, WebP, JPEG, GIF, or Same as Original
+- **Batch export** — download single files or a ZIP
+
+---
+
 ## Shared Features
 
 - **Privacy first** — files never leave your device
@@ -109,16 +127,19 @@ No install or build required.
 ├── index.html          # Image Converter page
 ├── resizer.html        # Image Resizer page
 ├── crop.html           # Image Cropper page
+├── corners.html        # Corner Rounder & Border Tool page
 ├── css/
 │   ├── shared.css      # Design system, layout, shared components
 │   ├── converter.css   # Converter-specific styles (gallery, etc.)
 │   ├── resizer.css     # Resizer-specific styles (transforms, mode toggles)
-│   └── crop.css        # Cropper-specific styles (crop dialog, aspect grid)
+│   ├── crop.css        # Cropper-specific styles (crop dialog, aspect grid)
+│   └── corners.css     # Corners & border specific styles
 ├── js/
 │   ├── shared.js       # Theme, custom selects/sliders, utilities, service worker
 │   ├── converter.js    # Conversion logic and gallery
 │   ├── resizer.js      # Resize, rotate, flip, and export logic
-│   └── crop.js         # Crop editor and export logic
+│   ├── crop.js         # Crop editor and export logic
+│   └── corners.js      # Corner rounding, border, and export logic
 ├── sw.js               # Service worker (offline cache)
 ├── manifest.json       # PWA manifest
 └── readme.md

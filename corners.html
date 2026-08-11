@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Offline Image Corner Rounder &amp; Border Tool — Round Corners | No Upload</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+    <meta name="description" content="Round image corners, add custom borders, and export PNG, WebP, JPEG, or GIF. Free, private, 100% offline batch tool — no upload required.">
+    <meta name="keywords" content="offline image corner rounder, round image corners online free, add border to image, batch round corners, rounded rectangle photo, border image browser, no upload">
+    <meta name="author" content="DevAtrii">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="googlebot" content="index, follow">
+    <link rel="canonical" href="https://devatrii.github.io/Image-Converter-Offline/corners.html">
+    <meta property="og:site_name" content="Image Converter &amp; Resizer">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Free Offline Image Corner Rounder &amp; Border Tool">
+    <meta property="og:description" content="Round image corners and add custom borders in your browser. Batch export PNG, WebP, JPEG, GIF with no uploads.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devatrii.github.io/Image-Converter-Offline/corners.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Free Offline Image Corner Rounder &amp; Border Tool">
+    <meta name="twitter:description" content="Round corners and add custom borders to photos in your browser. Free, offline, and private.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Offline Image Corner Rounder & Border Tool",
+        "url": "https://devatrii.github.io/Image-Converter-Offline/corners.html",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "description": "Free offline tool to round image corners, add customizable borders, and batch export.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Round image corners with custom radius or presets",
+            "Select individual corners (TL, TR, BL, BR)",
+            "Add custom borders with styles and color swatches",
+            "Control border position (inside vs outside)",
+            "Batch ZIP download",
+            "100% offline and private"
+        ],
+        "isAccessibleForFree": true,
+        "inLanguage": "en"
+    }
+    </script>
+    <meta name="theme-color" content="#15803d">
+    <meta name="msapplication-TileColor" content="#15803d">
+    <script>
+        (function () {
+            const key = 'imageConverterTheme';
+            const saved = localStorage.getItem(key);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
+    <link rel="preconnect" href="https://api.iconify.design">
+    <link rel="dns-prefetch" href="https://api.iconify.design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/corners.css">
+</head>
+<body>
+    <div class="container tool-page">
+        <nav class="tool-nav" aria-label="Tools">
+            <a href="index.html" class="tool-nav-link">
+                <iconify-icon icon="lucide:refresh-cw" width="14" height="14"></iconify-icon>
+                Converter
+            </a>
+            <a href="resizer.html" class="tool-nav-link">
+                <iconify-icon icon="lucide:scaling" width="14" height="14"></iconify-icon>
+                Resizer
+            </a>
+            <a href="crop.html" class="tool-nav-link">
+                <iconify-icon icon="lucide:crop" width="14" height="14"></iconify-icon>
+                Crop
+            </a>
+            <a href="corners.html" class="tool-nav-link active" aria-current="page">
+                <iconify-icon icon="lucide:square-round-corner" width="14" height="14"></iconify-icon>
+                Corners
+            </a>
+        </nav>
+
+        <header class="page-header tool-page-header">
+            <h1>Corner Rounder &amp; Border Tool</h1>
+            <p>Round image corners and add custom borders instantly in your browser. No uploads — PNG, WebP, JPEG, and GIF.</p>
+            <div class="badge-row">
+                <span class="badge">100% Offline</span>
+                <span class="badge">Batch Processing</span>
+                <span class="badge">Privacy First</span>
+            </div>
+        </header>
+
+        <div class="tool-workspace">
+            <aside class="tool-sidebar">
+                <div class="tool-sidebar-inner">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:square-round-corner" width="18" height="18"></iconify-icon>
+                                Corner &amp; Border Settings
+                            </h2>
+                            <p class="card-description">Customize corner radius, corner selection, border width, and styling.</p>
+                        </div>
+                        <div class="card-content">
+                            <!-- Corner Radius -->
+                            <div class="form-group">
+                                <label class="label label-icon" id="radiusLabel">
+                                    <iconify-icon icon="lucide:radius" width="14" height="14"></iconify-icon>
+                                    Corner Radius (px)
+                                </label>
+                                <div class="range-wrap">
+                                    <div class="custom-slider" id="radiusSlider" role="slider" aria-labelledby="radiusLabel" aria-valuemin="0" aria-valuemax="200" aria-valuenow="32" tabindex="0"></div>
+                                    <input class="input range-number-input" type="number" id="radiusInput" min="0" max="200" value="32">
+                                </div>
+                            </div>
+
+                            <!-- Presets -->
+                            <div class="form-group">
+                                <span class="label label-icon">
+                                    <iconify-icon icon="lucide:sparkles" width="14" height="14"></iconify-icon>
+                                    Quick Presets
+                                </span>
+                                <div class="corner-presets-grid">
+                                    <button class="preset-btn" type="button" data-preset="0">
+                                        <span class="preset-icon preset-icon-none"></span>
+                                        <span>0px</span>
+                                    </button>
+                                    <button class="preset-btn" type="button" data-preset="16">
+                                        <span class="preset-icon preset-icon-sm"></span>
+                                        <span>16px</span>
+                                    </button>
+                                    <button class="preset-btn active" type="button" data-preset="32">
+                                        <span class="preset-icon preset-icon-md"></span>
+                                        <span>32px</span>
+                                    </button>
+                                    <button class="preset-btn" type="button" data-preset="64">
+                                        <span class="preset-icon preset-icon-lg"></span>
+                                        <span>64px</span>
+                                    </button>
+                                    <button class="preset-btn" type="button" data-preset="full">
+                                        <span class="preset-icon preset-icon-full"></span>
+                                        <span>Full</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Individual Corners -->
+                            <div class="corner-select-container">
+                                <div class="corner-select-header">
+                                    <span class="label label-icon">
+                                        <iconify-icon icon="lucide:box-select" width="14" height="14"></iconify-icon>
+                                        Active Corners
+                                    </span>
+                                    <button class="btn btn-ghost btn-sm" type="button" id="toggleAllCornersBtn">Deselect All</button>
+                                </div>
+                                <div class="corner-select-grid">
+                                    <button class="corner-toggle-btn active" type="button" data-corner="tl">
+                                        <span class="corner-mini-indicator corner-mini-tl"></span>
+                                        <span>Top Left</span>
+                                    </button>
+                                    <button class="corner-toggle-btn active" type="button" data-corner="tr">
+                                        <span class="corner-mini-indicator corner-mini-tr"></span>
+                                        <span>Top Right</span>
+                                    </button>
+                                    <button class="corner-toggle-btn active" type="button" data-corner="bl">
+                                        <span class="corner-mini-indicator corner-mini-bl"></span>
+                                        <span>Bottom Left</span>
+                                    </button>
+                                    <button class="corner-toggle-btn active" type="button" data-corner="br">
+                                        <span class="corner-mini-indicator corner-mini-br"></span>
+                                        <span>Bottom Right</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <!-- Border Width -->
+                            <div class="form-group">
+                                <label class="label label-icon" id="borderWidthLabel">
+                                    <iconify-icon icon="lucide:frame" width="14" height="14"></iconify-icon>
+                                    Border Width (px)
+                                </label>
+                                <div class="range-wrap">
+                                    <div class="custom-slider" id="borderWidthSlider" role="slider" aria-labelledby="borderWidthLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"></div>
+                                    <input class="input range-number-input" type="number" id="borderWidthInput" min="0" max="100" value="0">
+                                </div>
+                            </div>
+
+                            <!-- Border Style -->
+                            <div class="form-group">
+                                <label class="label label-icon" id="borderStyleLabel">
+                                    <iconify-icon icon="lucide:minus" width="14" height="14"></iconify-icon>
+                                    Border Style
+                                </label>
+                                <div class="custom-select" id="borderStyle" role="combobox" aria-labelledby="borderStyleLabel" aria-haspopup="listbox"></div>
+                            </div>
+
+                            <!-- Border Color -->
+                            <div class="form-group">
+                                <label class="label label-icon" for="borderColorHex">
+                                    <iconify-icon icon="lucide:palette" width="14" height="14"></iconify-icon>
+                                    Border Color
+                                </label>
+                                <div class="color-picker-row">
+                                    <div class="color-input-wrap">
+                                        <input type="color" id="borderColorPicker" value="#ffffff">
+                                    </div>
+                                    <input class="input color-hex-input" type="text" id="borderColorHex" value="#FFFFFF" maxlength="7">
+                                </div>
+                                <div class="color-swatches" id="borderColorSwatches">
+                                    <button class="swatch-btn active" type="button" data-color="#ffffff" style="background: #ffffff;" title="White"></button>
+                                    <button class="swatch-btn" type="button" data-color="#000000" style="background: #000000;" title="Black"></button>
+                                    <button class="swatch-btn" type="button" data-color="#15803d" style="background: #15803d;" title="Green"></button>
+                                    <button class="swatch-btn" type="button" data-color="#3b82f6" style="background: #3b82f6;" title="Blue"></button>
+                                    <button class="swatch-btn" type="button" data-color="#f43f5e" style="background: #f43f5e;" title="Rose"></button>
+                                    <button class="swatch-btn" type="button" data-color="#eab308" style="background: #eab308;" title="Yellow"></button>
+                                    <button class="swatch-btn" type="button" data-color="#94a3b8" style="background: #94a3b8;" title="Slate"></button>
+                                </div>
+                            </div>
+
+                            <!-- Border Position -->
+                            <div class="form-group">
+                                <span class="label label-icon">
+                                    <iconify-icon icon="lucide:move-outer" width="14" height="14"></iconify-icon>
+                                    Border Position
+                                </span>
+                                <div class="mode-toggle" role="group" aria-label="Border position">
+                                    <button class="mode-toggle-btn active" type="button" id="borderPosOutsideBtn" aria-pressed="true">Outside Image</button>
+                                    <button class="mode-toggle-btn" type="button" id="borderPosInsideBtn" aria-pressed="false">Inside Image</button>
+                                </div>
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <!-- Background Fill -->
+                            <div class="form-group">
+                                <span class="label label-icon">
+                                    <iconify-icon icon="lucide:paint-bucket" width="14" height="14"></iconify-icon>
+                                    Background Fill
+                                </span>
+                                <div class="mode-toggle" role="group" aria-label="Background fill">
+                                    <button class="mode-toggle-btn active" type="button" id="bgTransparentBtn" aria-pressed="true">Transparent</button>
+                                    <button class="mode-toggle-btn" type="button" id="bgColorBtn" aria-pressed="false">Custom Color</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group hidden" id="bgColorPickerSection">
+                                <label class="label label-icon" for="bgColorHex">
+                                    <iconify-icon icon="lucide:droplet" width="14" height="14"></iconify-icon>
+                                    Canvas Background Color
+                                </label>
+                                <div class="color-picker-row">
+                                    <div class="color-input-wrap">
+                                        <input type="color" id="bgColorPicker" value="#ffffff">
+                                    </div>
+                                    <input class="input color-hex-input" type="text" id="bgColorHex" value="#FFFFFF" maxlength="7">
+                                </div>
+                                <div class="color-swatches" id="bgColorSwatches">
+                                    <button class="swatch-btn active" type="button" data-color="#ffffff" style="background: #ffffff;" title="White"></button>
+                                    <button class="swatch-btn" type="button" data-color="#000000" style="background: #000000;" title="Black"></button>
+                                    <button class="swatch-btn" type="button" data-color="#f8fafc" style="background: #f8fafc;" title="Off-White"></button>
+                                    <button class="swatch-btn" type="button" data-color="#15803d" style="background: #15803d;" title="Green"></button>
+                                    <button class="swatch-btn" type="button" data-color="#3b82f6" style="background: #3b82f6;" title="Blue"></button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:file-output" width="18" height="18"></iconify-icon>
+                                Export Settings
+                            </h2>
+                            <p class="card-description">Choose output format and optional target file size.</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="controls-grid">
+                                <div class="form-group">
+                                    <label class="label label-icon" id="exportFormatLabel">
+                                        <iconify-icon icon="lucide:file-image" width="14" height="14"></iconify-icon>
+                                        Save As
+                                    </label>
+                                    <div class="custom-select" id="exportFormat" role="combobox" aria-labelledby="exportFormatLabel" aria-haspopup="listbox"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" for="targetSize">
+                                        <iconify-icon icon="lucide:hard-drive" width="14" height="14"></iconify-icon>
+                                        Target File Size (KB)
+                                    </label>
+                                    <input class="input" type="number" id="targetSize" min="1" placeholder="Optional">
+                                    <p class="settings-tip">
+                                        <iconify-icon icon="lucide:info" width="14" height="14"></iconify-icon>
+                                        <span>Optional max size limit. Works best with JPEG and WebP.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-actions">
+                        <button class="btn btn-secondary" type="button" id="exportOnlyBtn" disabled>
+                            <iconify-icon icon="lucide:refresh-cw" width="16" height="16"></iconify-icon>
+                            Export
+                        </button>
+                        <button class="btn btn-primary" type="button" id="exportBtn" disabled>
+                            <iconify-icon icon="lucide:download" width="16" height="16"></iconify-icon>
+                            Export &amp; Download
+                        </button>
+                        <button class="btn btn-success hidden" type="button" id="downloadBtn">
+                            <iconify-icon icon="lucide:folder-down" width="16" height="16"></iconify-icon>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="tool-main">
+                <div class="card tool-main-card">
+                    <div class="card-header tool-main-header">
+                        <div>
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:images" width="18" height="18"></iconify-icon>
+                                Images
+                            </h2>
+                            <p class="card-description">Drag and drop or browse PNG, WebP, JPEG, and GIF files.</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" type="button" id="addImagesBtn">
+                            <iconify-icon icon="lucide:plus" width="16" height="16"></iconify-icon>
+                            Add Images
+                        </button>
+                    </div>
+                    <div class="card-content tool-main-content">
+                        <div class="drop-zone tool-drop-zone" id="dropZone">
+                            <iconify-icon class="drop-zone-icon" icon="lucide:upload" width="40" height="40"></iconify-icon>
+                            <p><strong>Drop images here</strong></p>
+                            <p>or click to browse</p>
+                            <p class="hint">Accepts PNG, WebP, JPEG, and GIF</p>
+                            <input type="file" id="fileInput" hidden multiple accept="image/png,image/jpeg,image/webp,image/gif">
+                        </div>
+
+                        <div class="preview tool-preview" id="preview"></div>
+
+                        <div class="progress" id="progress">
+                            <div class="spinner"></div>
+                            <span>Processing images…</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <section class="seo-section" aria-labelledby="corners-seo-heading">
+            <h2 id="corners-seo-heading">Free offline image corner rounder &amp; border tool — modify photos in your browser</h2>
+            <p>Round image corners with <strong>custom radii</strong> (0px to 200px or full circle/pill) and add customizable <strong>borders</strong> with solid, dashed, dotted, or double styles. Export individually or in batch as PNG, WebP, JPEG, or GIF.</p>
+            <div class="seo-columns">
+                <div>
+                    <h3>Also try</h3>
+                    <ul>
+                        <li><a href="index.html">Image Converter</a> — change formats</li>
+                        <li><a href="resizer.html">Image Resizer</a> — resize, rotate &amp; flip</li>
+                        <li><a href="crop.html">Image Cropper</a> — crop with aspect ratios</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Use cases</h3>
+                    <ul>
+                        <li>Rounded avatars &amp; profile pictures</li>
+                        <li>UI mockups with device borders</li>
+                        <li>Card images &amp; thumbnail framing</li>
+                        <li>Batch styling photos for web</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <iconify-icon icon="lucide:square-round-corner" width="18" height="18"></iconify-icon>
+                        Corner Rounder &amp; Border Tool
+                    </div>
+                    <p class="footer-brand-desc">
+                        Round image corners and add custom borders instantly in your browser. Free, private, and fully offline — no uploads, no watermarks, no data collection.
+                    </p>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Features</h3>
+                    <ul class="footer-links">
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Round corners with radius controls</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Custom borders &amp; color swatches</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Batch ZIP export</li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Settings</h3>
+                    <div class="footer-settings">
+                        <div>
+                            <div class="footer-setting-label">Appearance</div>
+                            <div class="theme-switcher" role="group" aria-label="Theme">
+                                <button class="theme-toggle-btn" type="button" id="themeLightBtn" aria-pressed="true" aria-label="Light mode">
+                                    <iconify-icon icon="lucide:sun" width="14" height="14"></iconify-icon>
+                                    <span>Light</span>
+                                </button>
+                                <button class="theme-toggle-btn" type="button" id="themeDarkBtn" aria-pressed="false" aria-label="Dark mode">
+                                    <iconify-icon icon="lucide:moon" width="14" height="14"></iconify-icon>
+                                    <span>Dark</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="footer-setting-label">Storage</div>
+                            <button class="footer-btn" type="button" id="clearCacheBtn">
+                                <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>
+                                Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Connect</h3>
+                    <div class="footer-social-links">
+                        <a href="https://github.com/DevAtrii/Image-Converter-Offline" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            <iconify-icon icon="lucide:github" width="16" height="16"></iconify-icon>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="footerYear"></span> Image Corner Rounder. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="gallery-dialog hidden" id="galleryDialog" role="dialog" aria-modal="true" aria-label="Image preview">
+        <div class="gallery-backdrop" id="galleryBackdrop"></div>
+        <div class="gallery-shell">
+            <div class="gallery-toolbar">
+                <span class="gallery-counter" id="galleryCounter">1 / 1</span>
+                <span class="gallery-title" id="galleryTitle"></span>
+                <div class="gallery-tools">
+                    <button class="btn btn-outline btn-icon btn-sm" type="button" id="galleryZoomOutBtn" title="Zoom out" aria-label="Zoom out">
+                        <iconify-icon icon="lucide:zoom-out" width="16" height="16"></iconify-icon>
+                    </button>
+                    <button class="btn btn-outline btn-icon btn-sm" type="button" id="galleryZoomInBtn" title="Zoom in" aria-label="Zoom in">
+                        <iconify-icon icon="lucide:zoom-in" width="16" height="16"></iconify-icon>
+                    </button>
+                    <button class="btn btn-outline btn-sm" type="button" id="galleryResetZoomBtn">
+                        <iconify-icon icon="lucide:scan" width="16" height="16"></iconify-icon>
+                        Reset
+                    </button>
+                    <button class="btn btn-outline btn-icon btn-sm" type="button" id="galleryCloseBtn" title="Close" aria-label="Close">
+                        <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="gallery-stage">
+                <button class="gallery-nav prev" type="button" id="galleryPrevBtn" aria-label="Previous image">
+                    <iconify-icon icon="lucide:chevron-left" width="18" height="18"></iconify-icon>
+                </button>
+                <div class="gallery-viewport" id="galleryViewport">
+                    <div class="gallery-image-wrap" id="galleryImageWrap">
+                        <img id="galleryImage" alt="">
+                    </div>
+                </div>
+                <button class="gallery-nav next" type="button" id="galleryNextBtn" aria-label="Next image">
+                    <iconify-icon icon="lucide:chevron-right" width="18" height="18"></iconify-icon>
+                </button>
+            </div>
+            <div class="gallery-footer">
+                <span class="gallery-hint">Pinch or scroll to zoom · Double-tap to toggle · Drag to pan · Arrow keys to navigate</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/corners.js"></script>
+</body>
+</html>
