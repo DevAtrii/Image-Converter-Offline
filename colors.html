@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Offline Image Color Picker — Pick Colors from Photos | No Upload</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+    <meta name="description" content="Pick colors from images with an eyedropper and extract dominant palettes. Copy HEX, RGB, or HSL values. Free, private, 100% offline — no upload required.">
+    <meta name="keywords" content="image color picker, pick color from image, eyedropper online, extract palette from photo, dominant colors, hex color picker, offline color tool">
+    <meta name="author" content="DevAtrii">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://devatrii.github.io/Image-Converter-Offline/colors.html">
+    <meta property="og:title" content="Free Offline Image Color Picker — Pick Colors from Photos">
+    <meta property="og:description" content="Pick colors from images and extract palettes in your browser. Copy HEX, RGB, or HSL with no uploads.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devatrii.github.io/Image-Converter-Offline/colors.html">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Offline Image Color Picker",
+        "url": "https://devatrii.github.io/Image-Converter-Offline/colors.html",
+        "applicationCategory": "MultimediaApplication",
+        "description": "Free offline image color picker with eyedropper and palette extraction.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "isAccessibleForFree": true
+    }
+    </script>
+    <meta name="theme-color" content="#15803d">
+    <script>
+        (function () {
+            const key = 'imageConverterTheme';
+            const saved = localStorage.getItem(key);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <link rel="preconnect" href="https://api.iconify.design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/colors.css">
+</head>
+<body>
+    <div class="container tool-page">
+        <div class="tool-nav-wrap">
+            <nav class="tool-nav" aria-label="Tools">
+                <a href="index.html" class="tool-nav-link"><iconify-icon icon="lucide:refresh-cw" width="14" height="14"></iconify-icon>Converter</a>
+                <a href="resizer.html" class="tool-nav-link"><iconify-icon icon="lucide:scaling" width="14" height="14"></iconify-icon>Resizer</a>
+                <a href="crop.html" class="tool-nav-link"><iconify-icon icon="lucide:crop" width="14" height="14"></iconify-icon>Crop</a>
+                <a href="corners.html" class="tool-nav-link"><iconify-icon icon="lucide:square-round-corner" width="14" height="14"></iconify-icon>Corners</a>
+                <a href="colors.html" class="tool-nav-link active" aria-current="page"><iconify-icon icon="lucide:pipette" width="14" height="14"></iconify-icon>Colors</a>
+                <a href="rotate.html" class="tool-nav-link"><iconify-icon icon="lucide:rotate-cw" width="14" height="14"></iconify-icon>Rotate</a>
+            </nav>
+        </div>
+
+        <header class="page-header tool-page-header">
+            <h1>Image Color Picker</h1>
+            <p>Pick colors from any image with an eyedropper and extract dominant palettes — HEX, RGB, and HSL.</p>
+            <div class="badge-row">
+                <span class="badge">100% Offline</span>
+                <span class="badge">Eyedropper</span>
+                <span class="badge">Privacy First</span>
+            </div>
+        </header>
+
+        <div class="tool-workspace">
+            <aside class="tool-sidebar">
+                <div class="tool-sidebar-inner">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:pipette" width="18" height="18"></iconify-icon>
+                                Picked Color
+                            </h2>
+                            <p class="card-description">Click any image to sample a pixel color.</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="color-picked">
+                                <div class="color-picked-swatch" id="pickedSwatch"></div>
+                                <div class="color-picked-values">
+                                    <div class="color-picked-label">Current color</div>
+                                    <div class="color-picked-value" id="pickedValue">Click an image to pick a color</div>
+                                    <div class="color-picked-actions">
+                                        <button class="btn btn-primary btn-sm" type="button" id="copyColorBtn" disabled>
+                                            <iconify-icon icon="lucide:copy" width="14" height="14"></iconify-icon>
+                                            <span>Copy</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:palette" width="18" height="18"></iconify-icon>
+                                Palette
+                            </h2>
+                            <p class="card-description">Dominant colors from the active image. Click to select.</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="palette-grid" id="paletteGrid">
+                                <div class="palette-empty">Upload an image to extract its palette</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:settings-2" width="18" height="18"></iconify-icon>
+                                Settings
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="controls-grid colors-settings-grid">
+                                <div class="form-group">
+                                    <label class="label label-icon" id="paletteCountLabel">
+                                        <iconify-icon icon="lucide:swatch-book" width="14" height="14"></iconify-icon>
+                                        Palette Size
+                                    </label>
+                                    <div class="custom-select" id="paletteCount" role="combobox" aria-labelledby="paletteCountLabel" aria-haspopup="listbox"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" id="colorFormatLabel">
+                                        <iconify-icon icon="lucide:hash" width="14" height="14"></iconify-icon>
+                                        Color Format
+                                    </label>
+                                    <div class="custom-select" id="colorFormat" role="combobox" aria-labelledby="colorFormatLabel" aria-haspopup="listbox"></div>
+                                </div>
+                            </div>
+                            <p class="settings-tip">
+                                <iconify-icon icon="lucide:info" width="14" height="14"></iconify-icon>
+                                <span>Click the large preview or use fullscreen. Hover for magnifier, click to pick a color.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="tool-main">
+                <div class="card tool-main-card">
+                    <div class="card-header tool-main-header">
+                        <div>
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:images" width="18" height="18"></iconify-icon>
+                                Images
+                            </h2>
+                            <p class="card-description">Drag and drop or browse PNG, WebP, JPEG, and GIF files.</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" type="button" id="addImagesBtn">
+                            <iconify-icon icon="lucide:plus" width="16" height="16"></iconify-icon>
+                            Add Images
+                        </button>
+                    </div>
+                    <div class="card-content tool-main-content">
+                        <div class="drop-zone tool-drop-zone" id="dropZone">
+                            <iconify-icon class="drop-zone-icon" icon="lucide:upload" width="40" height="40"></iconify-icon>
+                            <p><strong>Drop images here</strong></p>
+                            <p>or click to browse</p>
+                            <p class="hint">Accepts PNG, WebP, JPEG, and GIF</p>
+                            <input type="file" id="fileInput" hidden multiple accept="image/png,image/jpeg,image/webp,image/gif">
+                        </div>
+
+                        <div class="color-workspace hidden" id="colorWorkspace">
+                            <div class="color-stage-toolbar">
+                                <div class="color-stage-title" id="activeImageTitle">Select an image</div>
+                                <div class="btn-group">
+                                <button class="btn btn-outline btn-sm" type="button" id="removeActiveBtn" disabled>
+                                    <iconify-icon icon="lucide:trash-2" width="14" height="14"></iconify-icon>
+                                    Remove
+                                </button>
+                                <button class="btn btn-outline btn-sm" type="button" id="fullscreenBtn" disabled>
+                                    <iconify-icon icon="lucide:maximize" width="14" height="14"></iconify-icon>
+                                    Fullscreen
+                                </button>
+                                </div>
+                            </div>
+                            <div class="color-stage" id="colorStage">
+                                <img id="stageImage" alt="" draggable="false">
+                                <span class="color-picker-marker hidden" id="stageMarker"></span>
+                            </div>
+                            <div class="color-thumbnails" id="colorThumbnails"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <section class="seo-section" aria-labelledby="colors-seo-heading">
+            <h2 id="colors-seo-heading">Free offline image color picker — sample colors from photos</h2>
+            <p>Use the <strong>eyedropper</strong> to pick any pixel color and get <strong>HEX, RGB, or HSL</strong> values. Automatically extract a dominant color palette from uploaded images.</p>
+            <div class="seo-columns">
+                <div>
+                    <h3>Also try</h3>
+                    <ul>
+                        <li><a href="index.html">Image Converter</a> — change formats</li>
+                        <li><a href="crop.html">Image Cropper</a> — crop with aspect ratios</li>
+                        <li><a href="rotate.html">Image Rotator</a> — rotate and flip images</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Use cases</h3>
+                    <ul>
+                        <li>Match brand colors from a logo</li>
+                        <li>Build palettes from photos</li>
+                        <li>Get CSS color values for design</li>
+                        <li>Sample colors from screenshots</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <iconify-icon icon="lucide:pipette" width="18" height="18"></iconify-icon>
+                        Image Color Picker
+                    </div>
+                    <p class="footer-brand-desc">Pick colors and extract palettes from images in your browser. Free, private, and fully offline.</p>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Features</h3>
+                    <ul class="footer-links">
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Magnifier &amp; fullscreen picker</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Dominant palette extraction</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> HEX, RGB, and HSL copy</li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Settings</h3>
+                    <div class="footer-settings">
+                        <div>
+                            <div class="footer-setting-label">Appearance</div>
+                            <div class="theme-switcher" role="group" aria-label="Theme">
+                                <button class="theme-toggle-btn" type="button" id="themeLightBtn" aria-pressed="true" aria-label="Light mode">
+                                    <iconify-icon icon="lucide:sun" width="14" height="14"></iconify-icon><span>Light</span>
+                                </button>
+                                <button class="theme-toggle-btn" type="button" id="themeDarkBtn" aria-pressed="false" aria-label="Dark mode">
+                                    <iconify-icon icon="lucide:moon" width="14" height="14"></iconify-icon><span>Dark</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="footer-setting-label">Storage</div>
+                            <button class="footer-btn" type="button" id="clearCacheBtn">
+                                <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Connect</h3>
+                    <div class="footer-social-links">
+                        <a href="https://github.com/DevAtrii/Image-Converter-Offline" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            <iconify-icon icon="lucide:github" width="16" height="16"></iconify-icon>GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="footerYear"></span> Image Color Picker. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="color-magnifier hidden" id="colorMagnifier" aria-hidden="true">
+        <canvas id="magnifierCanvas" width="120" height="120"></canvas>
+    </div>
+
+    <div class="color-fullscreen hidden" id="colorFullscreen" role="dialog" aria-modal="true" aria-label="Fullscreen color picker">
+        <div class="color-fullscreen-backdrop" id="colorFullscreenBackdrop"></div>
+        <div class="color-fullscreen-shell">
+            <div class="color-fullscreen-toolbar">
+                <div>
+                    <div class="color-fullscreen-title" id="fullscreenTitle"></div>
+                    <div class="color-fullscreen-hint">Move for magnifier · Click to pick color</div>
+                </div>
+                <button class="btn btn-outline btn-icon btn-sm" type="button" id="fullscreenCloseBtn" aria-label="Close">
+                    <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+                </button>
+            </div>
+            <div class="color-fullscreen-stage" id="fullscreenStage">
+                <img id="fullscreenImage" alt="" draggable="false">
+                <span class="color-picker-marker hidden" id="fullscreenMarker"></span>
+            </div>
+            <div class="color-fullscreen-footer">
+                <div class="color-fullscreen-swatch" id="fullscreenSwatch"></div>
+                <span id="fullscreenColorValue">—</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/colors.js"></script>
+</body>
+</html>

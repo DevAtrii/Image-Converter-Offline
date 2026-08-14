@@ -1,10 +1,12 @@
-const CACHE_NAME = 'atrii-image-converter-v6';
+const CACHE_NAME = 'atrii-image-converter-v9';
 const urlsToCache = [
   '/',
   '/index.html',
   '/resizer.html',
   '/crop.html',
   '/corners.html',
+  '/colors.html',
+  '/rotate.html',
   '/manifest.json',
   '/robots.txt',
   '/sitemap.xml',
@@ -13,11 +15,15 @@ const urlsToCache = [
   '/css/resizer.css',
   '/css/crop.css',
   '/css/corners.css',
+  '/css/colors.css',
+  '/css/rotate.css',
   '/js/shared.js',
   '/js/converter.js',
   '/js/resizer.js',
   '/js/crop.js',
   '/js/corners.js',
+  '/js/colors.js',
+  '/js/rotate.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'
 ];
 

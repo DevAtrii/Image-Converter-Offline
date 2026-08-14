@@ -66,24 +66,16 @@
 </head>
 <body>
     <div class="container tool-page">
-        <nav class="tool-nav" aria-label="Tools">
-            <a href="index.html" class="tool-nav-link">
-                <iconify-icon icon="lucide:refresh-cw" width="14" height="14"></iconify-icon>
-                Converter
-            </a>
-            <a href="resizer.html" class="tool-nav-link">
-                <iconify-icon icon="lucide:scaling" width="14" height="14"></iconify-icon>
-                Resizer
-            </a>
-            <a href="crop.html" class="tool-nav-link">
-                <iconify-icon icon="lucide:crop" width="14" height="14"></iconify-icon>
-                Crop
-            </a>
-            <a href="corners.html" class="tool-nav-link active" aria-current="page">
-                <iconify-icon icon="lucide:square-round-corner" width="14" height="14"></iconify-icon>
-                Corners
-            </a>
-        </nav>
+        <div class="tool-nav-wrap">
+            <nav class="tool-nav" aria-label="Tools">
+                <a href="index.html" class="tool-nav-link"><iconify-icon icon="lucide:refresh-cw" width="14" height="14"></iconify-icon>Converter</a>
+                <a href="resizer.html" class="tool-nav-link"><iconify-icon icon="lucide:scaling" width="14" height="14"></iconify-icon>Resizer</a>
+                <a href="crop.html" class="tool-nav-link"><iconify-icon icon="lucide:crop" width="14" height="14"></iconify-icon>Crop</a>
+                <a href="corners.html" class="tool-nav-link active" aria-current="page"><iconify-icon icon="lucide:square-round-corner" width="14" height="14"></iconify-icon>Corners</a>
+                <a href="colors.html" class="tool-nav-link"><iconify-icon icon="lucide:pipette" width="14" height="14"></iconify-icon>Colors</a>
+                <a href="rotate.html" class="tool-nav-link"><iconify-icon icon="lucide:rotate-cw" width="14" height="14"></iconify-icon>Rotate</a>
+            </nav>
+        </div>
 
         <header class="page-header tool-page-header">
             <h1>Corner Rounder &amp; Border Tool</h1>
@@ -102,9 +94,9 @@
                         <div class="card-header">
                             <h2 class="card-title card-title-icon">
                                 <iconify-icon icon="lucide:square-round-corner" width="18" height="18"></iconify-icon>
-                                Corner &amp; Border Settings
+                                Corner Settings
                             </h2>
-                            <p class="card-description">Customize corner radius, corner selection, border width, and styling.</p>
+                            <p class="card-description">Radius presets and which corners to round.</p>
                         </div>
                         <div class="card-content">
                             <!-- Corner Radius -->
@@ -177,10 +169,18 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="separator"></div>
-
-                            <!-- Border Width -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:frame" width="18" height="18"></iconify-icon>
+                                Border &amp; Background
+                            </h2>
+                            <p class="card-description">Border width, style, color, position, and canvas fill.</p>
+                        </div>
+                        <div class="card-content">
                             <div class="form-group">
                                 <label class="label label-icon" id="borderWidthLabel">
                                     <iconify-icon icon="lucide:frame" width="14" height="14"></iconify-icon>
@@ -282,7 +282,7 @@
                             <p class="card-description">Choose output format and optional target file size.</p>
                         </div>
                         <div class="card-content">
-                            <div class="controls-grid">
+                            <div class="controls-grid corners-export-grid">
                                 <div class="form-group">
                                     <label class="label label-icon" id="exportFormatLabel">
                                         <iconify-icon icon="lucide:file-image" width="14" height="14"></iconify-icon>
@@ -367,6 +367,8 @@
                         <li><a href="index.html">Image Converter</a> — change formats</li>
                         <li><a href="resizer.html">Image Resizer</a> — resize, rotate &amp; flip</li>
                         <li><a href="crop.html">Image Cropper</a> — crop with aspect ratios</li>
+                        <li><a href="colors.html">Color Picker</a> — pick colors from images</li>
+                        <li><a href="rotate.html">Image Rotator</a> — rotate and flip images</li>
                     </ul>
                 </div>
                 <div>

@@ -1,8 +1,10 @@
-# Image Converter & Resizer
+# Image Converter & Toolkit
 
-**Live:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/) · **Resizer:** [resizer.html](https://devatrii.github.io/Image-Converter-Offline/resizer.html) · **Custom domain:** [atrii.dev](https://atrii.dev)
+**Live:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/) · **Custom domain:** [atrii.dev](https://atrii.dev)
 
-A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize, crop, rotate, flip, and batch export — with no uploads and no server processing.
+A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize, crop, round corners, pick colors, rotate, flip, and batch export — with no uploads and no server processing.
+
+> **For contributors & AI agents:** see [`AGENT.md`](AGENT.md) for architecture, conventions, and a checklist for adding tools.
 
 ## Tools
 
@@ -12,8 +14,10 @@ A fast, privacy-first image toolkit that runs entirely in your browser. Convert 
 | **Image Resizer** | [`resizer.html`](resizer.html) | Resize by pixels or percentage, rotate, flip, and export |
 | **Image Cropper** | [`crop.html`](crop.html) | Crop with aspect ratio presets, per-image editor, batch export |
 | **Corner Rounder** | [`corners.html`](corners.html) | Round corners, add custom borders, and export |
+| **Color Picker** | [`colors.html`](colors.html) | Eyedropper, palette extraction, copy HEX/RGB/HSL |
+| **Image Rotator** | [`rotate.html`](rotate.html) | Fine rotation, flip, batch selection, and export |
 
-All tools share the same two-pane layout: **settings on the left**, **images on the right**.
+All tools share the same two-pane layout: **settings on the left**, **images on the right**. A centered tool nav bar links all six pages.
 
 ---
 
@@ -82,6 +86,40 @@ Round image corners with custom radius presets and add customizable borders befo
 
 ---
 
+## Image Color Picker
+
+Pick colors from images with an eyedropper, extract dominant palettes, and copy values in multiple formats.
+
+### Features
+
+- **Eyedropper** — click any pixel to sample its color
+- **Magnifier** — circular loupe with crosshair for precise picking
+- **Fullscreen picker** — large preview dialog for detailed sampling
+- **Thumbnail strip** — switch between multiple images
+- **Palette extraction** — auto-detect 6, 8, or 12 dominant colors
+- **Color formats** — copy as HEX, RGB, or HSL
+- **Per-image palettes** — click a thumbnail to activate and view its palette
+
+---
+
+## Image Rotator
+
+Rotate and flip images with live preview, fine angle control, and batch export.
+
+### Features
+
+- **Fine rotation** — 0°–360° slider and numeric input on the selected image
+- **Rotate 90°** — clockwise and counter-clockwise per image or in batch
+- **Flip** — horizontal and vertical per image or in batch
+- **Batch selection** — check images to transform; applies to all when none selected
+- **Select all / deselect all** — quick selection controls below the preview grid
+- **Apply angle to selection** — copy the active image's angle to selected images
+- **Reset** — restore original orientation per image or in batch
+- **Export formats** — PNG, WebP, JPEG, GIF, or Same as Original
+- **Batch export** — download single files or a ZIP
+
+---
+
 ## Shared Features
 
 - **Privacy first** — files never leave your device
@@ -89,6 +127,7 @@ Round image corners with custom radius presets and add customizable borders befo
 - **PWA ready** — service worker caches assets for offline use
 - **Clear cache** — one-click reset of service worker and cached pages after updates
 - **Responsive layout** — sidebar + main panel on desktop, stacked on mobile
+- **Unified tool nav** — switch between all six tools from any page
 
 ---
 
@@ -111,7 +150,7 @@ Round image corners with custom radius presets and add customizable borders befo
    cd Image-Converter-Offline
    ```
 
-2. Open `index.html` or `resizer.html` in a browser, or serve the folder locally:
+2. Open any tool page (`index.html`, `resizer.html`, etc.) in a browser, or serve the folder locally:
 
    ```bash
    npx serve .
@@ -128,20 +167,29 @@ No install or build required.
 ├── resizer.html        # Image Resizer page
 ├── crop.html           # Image Cropper page
 ├── corners.html        # Corner Rounder & Border Tool page
+├── colors.html         # Image Color Picker page
+├── rotate.html         # Image Rotator page
 ├── css/
 │   ├── shared.css      # Design system, layout, shared components
 │   ├── converter.css   # Converter-specific styles (gallery, etc.)
 │   ├── resizer.css     # Resizer-specific styles (transforms, mode toggles)
 │   ├── crop.css        # Cropper-specific styles (crop dialog, aspect grid)
-│   └── corners.css     # Corners & border specific styles
+│   ├── corners.css     # Corners & border specific styles
+│   ├── colors.css      # Color picker styles
+│   └── rotate.css      # Rotator-specific styles
 ├── js/
 │   ├── shared.js       # Theme, custom selects/sliders, utilities, service worker
 │   ├── converter.js    # Conversion logic and gallery
 │   ├── resizer.js      # Resize, rotate, flip, and export logic
 │   ├── crop.js         # Crop editor and export logic
-│   └── corners.js      # Corner rounding, border, and export logic
+│   ├── corners.js      # Corner rounding, border, and export logic
+│   ├── colors.js       # Color picker and palette logic
+│   └── rotate.js       # Rotate, flip, and export logic
 ├── sw.js               # Service worker (offline cache)
 ├── manifest.json       # PWA manifest
+├── sitemap.xml         # SEO sitemap (all tool pages)
+├── robots.txt
+├── AGENT.md            # Architecture guide for contributors & AI agents
 └── readme.md
 ```
 
@@ -172,16 +220,22 @@ To serve at a root domain (e.g. `atrii.dev`), point DNS to GitHub Pages and add 
 Cache name and precached URLs are defined in `sw.js`:
 
 ```js
-const CACHE_NAME = 'atrii-image-converter-v5';
+const CACHE_NAME = 'atrii-image-converter-v9';
 const urlsToCache = [
   '/',
   '/index.html',
   '/resizer.html',
+  '/crop.html',
+  '/corners.html',
+  '/colors.html',
+  '/rotate.html',
   '/manifest.json',
   '/css/shared.css',
   // ...
 ];
 ```
+
+**Important:** bump `CACHE_NAME` and add new files to `urlsToCache` whenever you change static assets. See [`AGENT.md`](AGENT.md) for the full checklist.
 
 After deploying an update, use **Clear Cache** in the app footer to wipe old caches and load the latest version.
 
@@ -201,7 +255,7 @@ The site includes:
 
 1. [Google Search Console](https://search.google.com/search-console) — add property `https://devatrii.github.io/Image-Converter-Offline/`
 2. Submit sitemap: `https://devatrii.github.io/Image-Converter-Offline/sitemap.xml`
-3. Request indexing for `/`, `/resizer.html`, and `/crop.html`
+3. Request indexing for `/`, `/resizer.html`, `/crop.html`, `/corners.html`, `/colors.html`, and `/rotate.html`
 
 If you use a custom domain (`atrii.dev`), set it as the primary domain in Search Console and keep canonical URLs consistent.
 

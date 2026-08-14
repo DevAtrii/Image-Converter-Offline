@@ -249,6 +249,10 @@
   opacity: 0.7;
 }
 
+.tool-sidebar .corners-export-grid {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 640px) {
   .corner-presets-grid {
     grid-template-columns: repeat(3, 1fr);
