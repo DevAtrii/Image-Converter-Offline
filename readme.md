@@ -2,7 +2,7 @@
 
 **Live:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/) · **Custom domain:** [atrii.dev](https://atrii.dev)
 
-A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize, crop, round corners, pick colors, rotate, flip, design app icons, and batch export — with no uploads and no server processing.
+A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize, crop, round corners, pick colors, rotate, flip, design app icons, turn SVG into rasters, and batch export — with no uploads and no server processing.
 
 > **For contributors & AI agents:** see [`AGENT.md`](AGENT.md) for architecture, conventions, and a checklist for adding tools.
 
@@ -17,8 +17,10 @@ A fast, privacy-first image toolkit that runs entirely in your browser. Convert 
 | **Color Picker** | [`colors.html`](colors.html) | Eyedropper, palette extraction, copy HEX/RGB/HSL |
 | **Image Rotator** | [`rotate.html`](rotate.html) | Fine rotation, flip, batch selection, and export |
 | **Icon Maker** | [`icon-maker.html`](icon-maker.html) | App icons from Iconify/text/image — Android + iOS ZIP |
+| **SVG to Image** | [`svg-to-image.html`](svg-to-image.html) | SVG & Android Vector XML → PNG, WebP, JPEG, GIF |
+| **Remove Colors** | [`remove-colors.html`](remove-colors.html) | Knock out picked colors — per-color threshold, PNG alpha |
 
-All tools share the same two-pane layout: **settings on the left**, **preview on the right**. A centered tool nav bar links all seven pages.
+All tools share the same two-pane layout: **settings on the left**, **preview on the right**. A centered tool nav bar links all nine pages.
 
 ---
 
@@ -142,6 +144,38 @@ Iconify packs and Google Fonts need a network connection the first time. Files n
 
 ---
 
+## SVG to Image
+
+Convert SVG markup and Android Vector Drawable XML into PNG, WebP, JPEG, or GIF — paste code, drop files, or pick from disk.
+
+### Features
+
+- **Paste code** — SVG, `<vector>` XML, or raw path data
+- **Drag & drop** — `.svg` and `.xml` (Android Vector Drawable)
+- **Vector XML** — groups, clip paths, fills, strokes, linear/radial gradients
+- **Output size** — native, presets (128–1024), custom width/height, scale %
+- **Quality & size** — quality slider and optional max output KB
+- **Batch ZIP** — convert many files, download one archive
+- **Remembers settings** — format, quality, scale, and size in `localStorage`
+
+---
+
+## Remove Colors
+
+Knock one or more colors out of a photo — pick with an eyedropper, type HEX, or use the color picker. Each color has its own threshold and edge softness.
+
+### Features
+
+- **Eyedropper** — click the photo (magnifier on hover), same idea as Color Picker
+- **Enter color** — HEX / RGB or native color picker
+- **Multiple colors** — add, disable, or delete independently
+- **Per-color threshold & softness** — tight cut or faded edge
+- **Match mode** — RGB (paint chips) or Hue (green screen / solid backdrop)
+- **Hold Original** — compare before / after
+- **Export** — PNG/WebP keep transparency; JPEG fills white; batch ZIP
+
+---
+
 ## Shared Features
 
 - **Privacy first** — files never leave your device
@@ -149,7 +183,7 @@ Iconify packs and Google Fonts need a network connection the first time. Files n
 - **PWA ready** — service worker caches assets for offline use
 - **Clear cache** — one-click reset of service worker and cached pages after updates
 - **Responsive layout** — sidebar + main panel on desktop, stacked on mobile
-- **Unified tool nav** — switch between all seven tools from any page
+- **Unified tool nav** — switch between all nine tools from any page
 
 ---
 
@@ -192,6 +226,8 @@ No install or build required.
 ├── colors.html         # Image Color Picker page
 ├── rotate.html         # Image Rotator page
 ├── icon-maker.html     # App Icon Maker page
+├── svg-to-image.html   # SVG / Vector XML to raster
+├── remove-colors.html  # Color knockout / chroma key
 ├── css/
 │   ├── shared.css      # Design system, layout, shared components
 │   ├── converter.css   # Converter-specific styles (gallery, etc.)
@@ -200,7 +236,9 @@ No install or build required.
 │   ├── corners.css     # Corners & border specific styles
 │   ├── colors.css      # Color picker styles
 │   ├── rotate.css      # Rotator-specific styles
-│   └── icon-maker.css  # Icon maker (picker modal, home-screen mocks)
+│   ├── icon-maker.css  # Icon maker (picker modal, home-screen mocks)
+│   ├── svg-to-image.css
+│   └── remove-colors.css
 ├── js/
 │   ├── shared.js       # Theme, custom selects/sliders, utilities, service worker
 │   ├── converter.js    # Conversion logic and gallery
@@ -209,7 +247,9 @@ No install or build required.
 │   ├── corners.js      # Corner rounding, border, and export logic
 │   ├── colors.js       # Color picker and palette logic
 │   ├── rotate.js       # Rotate, flip, and export logic
-│   └── icon-maker.js   # Icon editor, effects, previews, ZIP export
+│   ├── icon-maker.js   # Icon editor, effects, previews, ZIP export
+│   ├── svg-to-image.js # SVG + Vector XML parse and raster export
+│   └── remove-colors.js
 ├── sw.js               # Service worker (offline cache)
 ├── manifest.json       # PWA manifest
 ├── sitemap.xml         # SEO sitemap (all tool pages)
@@ -245,7 +285,7 @@ To serve at a root domain (e.g. `atrii.dev`), point DNS to GitHub Pages and add 
 Cache name and precached URLs are defined in `sw.js`:
 
 ```js
-const CACHE_NAME = 'atrii-image-converter-v10';
+const CACHE_NAME = 'atrii-image-converter-v24';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -255,6 +295,8 @@ const urlsToCache = [
   '/colors.html',
   '/rotate.html',
   '/icon-maker.html',
+  '/svg-to-image.html',
+  '/remove-colors.html',
   '/manifest.json',
   '/css/shared.css',
   // ...
@@ -281,7 +323,7 @@ The site includes:
 
 1. [Google Search Console](https://search.google.com/search-console) — add property `https://devatrii.github.io/Image-Converter-Offline/`
 2. Submit sitemap: `https://devatrii.github.io/Image-Converter-Offline/sitemap.xml`
-3. Request indexing for `/`, `/resizer.html`, `/crop.html`, `/corners.html`, `/colors.html`, `/rotate.html`, and `/icon-maker.html`
+3. Request indexing for `/`, `/resizer.html`, `/crop.html`, `/corners.html`, `/colors.html`, `/rotate.html`, `/icon-maker.html`, `/svg-to-image.html`, and `/remove-colors.html`
 
 If you use a custom domain (`atrii.dev`), set it as the primary domain in Search Console and keep canonical URLs consistent.
 

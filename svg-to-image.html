@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Offline SVG to Image — PNG, WebP, JPEG, GIF | Vector XML</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+    <meta name="description" content="Convert SVG and Android Vector Drawable XML to PNG, WebP, JPEG, or GIF in your browser. Paste code, drop files, batch export. Free, private, 100% offline.">
+    <meta name="keywords" content="svg to png, svg to webp, svg to jpeg, android vector drawable to png, vector xml to image, offline svg converter, paste svg, batch svg convert">
+    <meta name="author" content="DevAtrii">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://devatrii.github.io/Image-Converter-Offline/svg-to-image.html">
+    <meta property="og:site_name" content="Image Converter &amp; Resizer">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Free Offline SVG to Image — PNG, WebP, JPEG, GIF">
+    <meta property="og:description" content="Convert SVG and Android vector XML to raster images in your browser. Paste code or drop files. No uploads.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devatrii.github.io/Image-Converter-Offline/svg-to-image.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Free Offline SVG to Image — PNG, WebP, JPEG, GIF">
+    <meta name="twitter:description" content="Convert SVG and Android vector XML in your browser. Paste code or drop files. No uploads.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Offline SVG to Image",
+        "url": "https://devatrii.github.io/Image-Converter-Offline/svg-to-image.html",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "description": "Free offline SVG and Android Vector Drawable converter. Paste code or drop files, export PNG, WebP, JPEG, or GIF.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Convert SVG to PNG, WebP, JPEG, and GIF",
+            "Android Vector Drawable XML support",
+            "Paste code or drag and drop files",
+            "Batch conversion with ZIP download",
+            "Quality and output size controls",
+            "100% offline and private"
+        ],
+        "isAccessibleForFree": true,
+        "inLanguage": "en"
+    }
+    </script>
+    <meta name="theme-color" content="#15803d">
+    <script>
+        (function () {
+            const key = 'imageConverterTheme';
+            const saved = localStorage.getItem(key);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
+    <link rel="preconnect" href="https://api.iconify.design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/svg-to-image.css">
+</head>
+<body>
+    <div class="container tool-page">
+        <div class="tool-nav-wrap">
+            <nav class="tool-nav" aria-label="Tools">
+                <a href="index.html" class="tool-nav-link"><iconify-icon icon="lucide:refresh-cw" width="14" height="14"></iconify-icon>Converter</a>
+                <a href="resizer.html" class="tool-nav-link"><iconify-icon icon="lucide:scaling" width="14" height="14"></iconify-icon>Resizer</a>
+                <a href="crop.html" class="tool-nav-link"><iconify-icon icon="lucide:crop" width="14" height="14"></iconify-icon>Crop</a>
+                <a href="corners.html" class="tool-nav-link"><iconify-icon icon="lucide:square-round-corner" width="14" height="14"></iconify-icon>Corners</a>
+                <a href="colors.html" class="tool-nav-link"><iconify-icon icon="lucide:pipette" width="14" height="14"></iconify-icon>Colors</a>
+                <a href="rotate.html" class="tool-nav-link"><iconify-icon icon="lucide:rotate-cw" width="14" height="14"></iconify-icon>Rotate</a>
+                <a href="icon-maker.html" class="tool-nav-link"><iconify-icon icon="lucide:shapes" width="14" height="14"></iconify-icon>Icons</a>
+                <a href="svg-to-image.html" class="tool-nav-link active" aria-current="page"><iconify-icon icon="lucide:code-xml" width="14" height="14"></iconify-icon>SVG</a>
+                <a href="remove-colors.html" class="tool-nav-link"><iconify-icon icon="lucide:eraser" width="14" height="14"></iconify-icon>Remove</a>
+            </nav>
+        </div>
+
+        <header class="page-header tool-page-header">
+            <h1>SVG to Image</h1>
+            <p>Convert SVG and Android Vector XML to PNG, WebP, JPEG, or GIF. Paste code, drop files — nothing leaves your browser.</p>
+            <div class="badge-row">
+                <span class="badge">100% Offline</span>
+                <span class="badge">Vector XML</span>
+                <span class="badge">Privacy First</span>
+            </div>
+        </header>
+
+        <div class="tool-workspace">
+            <aside class="tool-sidebar">
+                <div class="tool-sidebar-inner">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:sliders-horizontal" width="18" height="18"></iconify-icon>
+                                Conversion Settings
+                            </h2>
+                            <p class="card-description">Output format, quality, and optional max file size. Last settings are remembered.</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="label label-icon" id="toFormatLabel">
+                                    <iconify-icon icon="lucide:file-output" width="14" height="14"></iconify-icon>
+                                    To
+                                </label>
+                                <div class="custom-select" id="toFormat" role="combobox" aria-labelledby="toFormatLabel" aria-haspopup="listbox"></div>
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <div class="controls-grid">
+                                <div class="form-group">
+                                    <label class="label label-icon" for="maxSize">
+                                        <iconify-icon icon="lucide:hard-drive" width="14" height="14"></iconify-icon>
+                                        Max Size (KB)
+                                    </label>
+                                    <input class="input" type="number" id="maxSize" min="1" value="1024">
+                                </div>
+                                <div class="range-group">
+                                    <label class="label label-icon" id="qualityLabel">
+                                        <iconify-icon icon="lucide:sparkles" width="14" height="14"></iconify-icon>
+                                        Quality
+                                    </label>
+                                    <div class="range-wrap">
+                                        <div class="custom-slider" id="quality" role="slider" aria-labelledby="qualityLabel" aria-valuemin="1" aria-valuemax="100" aria-valuenow="90" tabindex="0"></div>
+                                        <span class="range-value" id="qualityValue">90%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:scaling" width="18" height="18"></iconify-icon>
+                                Output Size
+                            </h2>
+                            <p class="card-description">Leave width and height empty for native size. Vector XML is often 24dp — pick a preset for a sharp export.</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="svg-size-presets" id="sizePresets" role="group" aria-label="Size presets">
+                                <button class="btn btn-outline btn-sm svg-preset-btn is-active" type="button" data-size="">Native</button>
+                                <button class="btn btn-outline btn-sm svg-preset-btn" type="button" data-size="128">128</button>
+                                <button class="btn btn-outline btn-sm svg-preset-btn" type="button" data-size="256">256</button>
+                                <button class="btn btn-outline btn-sm svg-preset-btn" type="button" data-size="512">512</button>
+                                <button class="btn btn-outline btn-sm svg-preset-btn" type="button" data-size="1024">1024</button>
+                            </div>
+                            <div class="controls-grid">
+                                <div class="form-group">
+                                    <label class="label label-icon" for="outWidth">
+                                        <iconify-icon icon="lucide:move-horizontal" width="14" height="14"></iconify-icon>
+                                        Width (px)
+                                    </label>
+                                    <input class="input" type="number" id="outWidth" min="1" max="8192" placeholder="Auto">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" for="outHeight">
+                                        <iconify-icon icon="lucide:move-vertical" width="14" height="14"></iconify-icon>
+                                        Height (px)
+                                    </label>
+                                    <input class="input" type="number" id="outHeight" min="1" max="8192" placeholder="Auto">
+                                </div>
+                            </div>
+                            <div class="range-group">
+                                <label class="label label-icon" id="scaleLabel">
+                                    <iconify-icon icon="lucide:percent" width="14" height="14"></iconify-icon>
+                                    Scale
+                                </label>
+                                <div class="range-wrap">
+                                    <div class="custom-slider" id="scale" role="slider" aria-labelledby="scaleLabel" aria-valuemin="10" aria-valuemax="400" aria-valuenow="100" tabindex="0"></div>
+                                    <span class="range-value" id="scaleValue">100%</span>
+                                </div>
+                            </div>
+                            <p class="settings-tip">
+                                <iconify-icon icon="lucide:info" width="14" height="14"></iconify-icon>
+                                <span>JPEG fills a white background. PNG and WebP keep transparency.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-actions">
+                        <button class="btn btn-secondary" type="button" id="convertOnlyBtn" disabled>
+                            <iconify-icon icon="lucide:refresh-cw" width="16" height="16"></iconify-icon>
+                            Convert
+                        </button>
+                        <button class="btn btn-primary" type="button" id="convertBtn" disabled>
+                            <iconify-icon icon="lucide:download" width="16" height="16"></iconify-icon>
+                            Convert &amp; Download
+                        </button>
+                        <button class="btn btn-success hidden" type="button" id="downloadBtn">
+                            <iconify-icon icon="lucide:folder-down" width="16" height="16"></iconify-icon>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="tool-main">
+                <div class="card tool-main-card">
+                    <div class="card-header tool-main-header">
+                        <div>
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:images" width="18" height="18"></iconify-icon>
+                                Vectors
+                            </h2>
+                            <p class="card-description">Drop <code>.svg</code> / <code>.xml</code> files, browse, or paste SVG / Vector Drawable code.</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" type="button" id="addImagesBtn">
+                            <iconify-icon icon="lucide:plus" width="16" height="16"></iconify-icon>
+                            Add Files
+                        </button>
+                    </div>
+                    <div class="card-content tool-main-content">
+                        <div class="drop-zone tool-drop-zone" id="dropZone">
+                            <iconify-icon class="drop-zone-icon" icon="lucide:upload" width="40" height="40"></iconify-icon>
+                            <p><strong>Drop SVG or vector XML here</strong></p>
+                            <p>or click to browse</p>
+                            <p class="hint">Accepts .svg and Android Vector Drawable .xml</p>
+                            <input type="file" id="fileInput" hidden multiple accept=".svg,.xml,image/svg+xml,text/xml,application/xml">
+                        </div>
+
+                        <div class="svg-code-panel">
+                            <label class="label label-icon" for="svgCode">
+                                <iconify-icon icon="lucide:code-xml" width="14" height="14"></iconify-icon>
+                                Paste SVG or Vector XML
+                            </label>
+                            <textarea class="input svg-code-input" id="svgCode" spellcheck="false" placeholder="&lt;svg …&gt; or &lt;vector android:viewportWidth=…&gt;&#10;Paste code, then Add from code."></textarea>
+                            <div class="svg-code-actions">
+                                <button class="btn btn-secondary btn-sm" type="button" id="addCodeBtn">
+                                    <iconify-icon icon="lucide:plus" width="14" height="14"></iconify-icon>
+                                    Add from code
+                                </button>
+                                <button class="btn btn-outline btn-sm" type="button" id="clearCodeBtn">
+                                    <iconify-icon icon="lucide:eraser" width="14" height="14"></iconify-icon>
+                                    Clear
+                                </button>
+                                <span class="svg-code-status" id="codeStatus" aria-live="polite"></span>
+                            </div>
+                        </div>
+
+                        <div class="preview tool-preview" id="preview"></div>
+
+                        <div class="progress" id="progress">
+                            <div class="spinner"></div>
+                            <span>Converting vectors…</span>
+                        </div>
+
+                        <div class="select-actions hidden" id="selectActions">
+                            <div class="actions-bar">
+                                <button class="btn btn-outline btn-sm" type="button" id="selectAllBtn">Select All</button>
+                                <button class="btn btn-outline btn-sm" type="button" id="deselectAllBtn">Deselect All</button>
+                                <button class="btn btn-secondary btn-sm" type="button" id="convertSelectedBtn" disabled>Convert Selected</button>
+                            </div>
+                        </div>
+
+                        <div class="card hidden converter-results-card" id="resultsCard">
+                            <div class="card-header">
+                                <h2 class="card-title card-title-icon">
+                                    <iconify-icon icon="lucide:bar-chart-3" width="18" height="18"></iconify-icon>
+                                    Conversion Results
+                                </h2>
+                                <p class="card-description">File sizes before and after conversion.</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="results-list" id="resultsList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <section class="seo-section" aria-labelledby="svg-seo-heading">
+            <h2 id="svg-seo-heading">Free offline SVG to image converter — paste code or drop files</h2>
+            <p>Turn <strong>SVG</strong> and <strong>Android Vector Drawable XML</strong> into <strong>PNG, WebP, JPEG, or GIF</strong> in your browser. No uploads, no watermarks, batch ZIP when you convert more than one.</p>
+            <div class="seo-columns">
+                <div>
+                    <h3>What you can convert</h3>
+                    <ul>
+                        <li>Standard SVG markup (paste or <code>.svg</code> files)</li>
+                        <li>Android <code>&lt;vector&gt;</code> drawables from <code>res/drawable</code></li>
+                        <li>Path data and grouped transforms, fills, strokes, clip paths</li>
+                        <li>Linear and radial gradients in Vector Drawable XML</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Also try</h3>
+                    <ul>
+                        <li><a href="index.html">Image Converter</a> — raster format conversion</li>
+                        <li><a href="resizer.html">Image Resizer</a> — pixels or percent</li>
+                        <li><a href="icon-maker.html">Icon Maker</a> — Android &amp; iOS app icons</li>
+                        <li><a href="crop.html">Image Cropper</a> — crop with aspect ratios</li>
+                        <li><a href="remove-colors.html">Remove Colors</a> — knock out picked colors</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <iconify-icon icon="lucide:code-xml" width="18" height="18"></iconify-icon>
+                        SVG to Image
+                    </div>
+                    <p class="footer-brand-desc">Convert SVG and Android vector XML in your browser. Free, private, and fully offline.</p>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Features</h3>
+                    <ul class="footer-links">
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Paste SVG or Vector XML</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Drag &amp; drop .svg / .xml</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Batch ZIP export</li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Settings</h3>
+                    <div class="footer-settings">
+                        <div>
+                            <div class="footer-setting-label">Appearance</div>
+                            <div class="theme-switcher" role="group" aria-label="Theme">
+                                <button class="theme-toggle-btn" type="button" id="themeLightBtn" aria-pressed="true" aria-label="Light mode">
+                                    <iconify-icon icon="lucide:sun" width="14" height="14"></iconify-icon><span>Light</span>
+                                </button>
+                                <button class="theme-toggle-btn" type="button" id="themeDarkBtn" aria-pressed="false" aria-label="Dark mode">
+                                    <iconify-icon icon="lucide:moon" width="14" height="14"></iconify-icon><span>Dark</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="footer-setting-label">Storage</div>
+                            <button class="footer-btn" type="button" id="clearCacheBtn">
+                                <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Connect</h3>
+                    <div class="footer-social-links">
+                        <a href="https://github.com/DevAtrii/Image-Converter-Offline" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            <iconify-icon icon="lucide:github" width="16" height="16"></iconify-icon>GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="footerYear"></span> SVG to Image. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/svg-to-image.js"></script>
+</body>
+</html>

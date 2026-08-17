@@ -4,12 +4,12 @@ Quick orientation for AI agents working in this repo. Read this before exploring
 
 ## What this project is
 
-A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no build step, no framework). Seven tools share one design system and layout pattern. Deployed to GitHub Pages; custom domain `atrii.dev`.
+A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no build step, no framework). Nine tools share one design system and layout pattern. Deployed to GitHub Pages; custom domain `atrii.dev`.
 
 | Live URL | `https://devatrii.github.io/Image-Converter-Offline/` |
 | Repo | `https://github.com/DevAtrii/Image-Converter-Offline` |
 
-**Supported input formats:** PNG, JPEG, WebP, GIF (all tools).
+**Supported input formats:** PNG, JPEG, WebP, GIF (raster tools). SVG + Android Vector Drawable XML (SVG to Image).
 
 ---
 
@@ -24,6 +24,8 @@ A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no bu
 | Color Picker | `colors.html` | `js/colors.js` | `css/colors.css` | `imageColorsSettings` |
 | Rotator | `rotate.html` | `js/rotate.js` | `css/rotate.css` | `imageRotateSettings` |
 | Icon Maker | `icon-maker.html` | `js/icon-maker.js` | `css/icon-maker.css` | `imageIconMakerSettings` / `imageIconMakerIconPack` |
+| SVG to Image | `svg-to-image.html` | `js/svg-to-image.js` | `css/svg-to-image.css` | `imageSvgToImageSettings` |
+| Remove Colors | `remove-colors.html` | `js/remove-colors.js` | `css/remove-colors.css` | `imageRemoveColorsSettings` |
 
 **Shared:** `css/shared.css`, `js/shared.js`, `sw.js`, `manifest.json`, `sitemap.xml`, `robots.txt`
 
@@ -33,7 +35,7 @@ A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no bu
 
 ```
 .container.tool-page
-  .tool-nav-wrap > nav.tool-nav          ← 7 tool links, active page gets .active
+  .tool-nav-wrap > nav.tool-nav          ← 9 tool links, active page gets .active
   header.page-header.tool-page-header
   .tool-workspace
     aside.tool-sidebar > .tool-sidebar-inner
@@ -53,9 +55,9 @@ footer.site-footer                        ← theme toggle, clear cache
 
 ### Tool nav (copy to every new page)
 
-All seven links, compact single-line format inside `tool-nav-wrap`:
+All nine links, compact single-line format inside `tool-nav-wrap`:
 
-Converter · Resizer · Crop · Corners · Colors · Rotate · Icons
+Converter · Resizer · Crop · Corners · Colors · Rotate · Icons · SVG · Remove
 
 Mark current page: `class="tool-nav-link active" aria-current="page"`.
 
@@ -119,7 +121,7 @@ let previewUrls = [];        // data URLs for thumbnails
 
 JPEG exports: fill white background before draw (transparency → white).
 
-### Batch selection (Converter + Rotator)
+### Batch selection (Converter + Rotator + SVG to Image)
 
 - Checkbox: `.preview-checkbox` on each `.preview-item`.
 - Converter: `selectAllImages()`, `deselectAllImages()`, `getSelectedIndexes()`.
@@ -139,7 +141,7 @@ Tool-specific overrides go in `css/<tool>.css`, not shared.css, unless the chang
 
 ## Service worker (`sw.js`)
 
-- Cache name: `atrii-image-converter-v11` (increment on asset changes).
+- Cache name: `atrii-image-converter-v24` (increment on asset changes).
 - Precaches all HTML, CSS, JS, manifest, sitemap, robots, JSZip CDN.
 - **After adding/changing static files:** bump `CACHE_NAME` and add new paths to `urlsToCache`.
 - Users can clear via footer **Clear Cache** (unregisters SW + deletes caches + reloads).
@@ -150,7 +152,7 @@ Tool-specific overrides go in `css/<tool>.css`, not shared.css, unless the chang
 
 1. Create `tool.html`, `js/tool.js`, `css/tool.css`.
 2. Copy page shell from an existing tool (head meta, nav, footer, script tags).
-3. Add nav link to **all 6+ other HTML pages**.
+3. Add nav link to **all other HTML pages**.
 4. Add URLs to `sw.js` (`urlsToCache`) and bump `CACHE_NAME`.
 5. Add entry to `sitemap.xml`.
 6. Update `readme.md` tools table + this file.
@@ -201,6 +203,21 @@ Tool-specific overrides go in `css/<tool>.css`, not shared.css, unless the chang
 - Live Android/iOS home-screen mocks; Android **Themed** toggle uses monochrome glyph.
 - Export ZIP matches icon.kitchen: `android/res/mipmap-*` adaptive layers + `ios/` AppIcon catalog + `Contents.json`.
 - Iconify collections/search need network; text/image still render locally after fonts/SVGs load.
+
+### SVG to Image (`svg-to-image.js`)
+- Inputs: `.svg` / `.xml` drop + file picker + paste textarea (Ctrl/Cmd+Enter).
+- Android `<vector>` (and nested vector inside `animated-vector`) converted to SVG, then rasterized via Canvas.
+- Supports groups, clip-path, fill/stroke, evenOdd, aapt linear/radial gradients, `#AARRGGBB` colors.
+- Path-only paste (`M …`) wrapped in 24×24 SVG.
+- Output size: Native / 128 / 256 / 512 / 1024 presets, optional W×H, scale 10–400%.
+- Converter-like pipeline: quality, max KB, batch ZIP, select-all, Convert vs Convert & Download.
+
+### Remove Colors (`remove-colors.js`)
+- Global color list applied to all images. Pick from stage (magnifier + click) or HEX / `<input type="color">`.
+- Per color: `{ r, g, b, threshold 0–100, softness 0–50, enabled }`.
+- Match mode `rgb` (Euclidean) or `hue`. Softness fades alpha at the threshold edge.
+- Live preview on a downscaled canvas (`PREVIEW_MAX` 900). Export uses full-res source.
+- Hold **Original** to compare. PNG/WebP keep alpha; JPEG flattens on white.
 
 ---
 
