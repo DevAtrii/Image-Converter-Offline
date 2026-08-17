@@ -4,7 +4,7 @@ Quick orientation for AI agents working in this repo. Read this before exploring
 
 ## What this project is
 
-A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no build step, no framework). Six tools share one design system and layout pattern. Deployed to GitHub Pages; custom domain `atrii.dev`.
+A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no build step, no framework). Seven tools share one design system and layout pattern. Deployed to GitHub Pages; custom domain `atrii.dev`.
 
 | Live URL | `https://devatrii.github.io/Image-Converter-Offline/` |
 | Repo | `https://github.com/DevAtrii/Image-Converter-Offline` |
@@ -23,6 +23,7 @@ A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no bu
 | Corner Rounder | `corners.html` | `js/corners.js` | `css/corners.css` | `imageCornersSettings` |
 | Color Picker | `colors.html` | `js/colors.js` | `css/colors.css` | `imageColorsSettings` |
 | Rotator | `rotate.html` | `js/rotate.js` | `css/rotate.css` | `imageRotateSettings` |
+| Icon Maker | `icon-maker.html` | `js/icon-maker.js` | `css/icon-maker.css` | `imageIconMakerSettings` / `imageIconMakerIconPack` |
 
 **Shared:** `css/shared.css`, `js/shared.js`, `sw.js`, `manifest.json`, `sitemap.xml`, `robots.txt`
 
@@ -32,7 +33,7 @@ A **vanilla HTML/CSS/JS** image toolkit that runs **100% in the browser** (no bu
 
 ```
 .container.tool-page
-  .tool-nav-wrap > nav.tool-nav          ← 6 tool links, active page gets .active
+  .tool-nav-wrap > nav.tool-nav          ← 7 tool links, active page gets .active
   header.page-header.tool-page-header
   .tool-workspace
     aside.tool-sidebar > .tool-sidebar-inner
@@ -52,9 +53,9 @@ footer.site-footer                        ← theme toggle, clear cache
 
 ### Tool nav (copy to every new page)
 
-All six links, compact single-line format inside `tool-nav-wrap`:
+All seven links, compact single-line format inside `tool-nav-wrap`:
 
-Converter · Resizer · Crop · Corners · Colors · Rotate
+Converter · Resizer · Crop · Corners · Colors · Rotate · Icons
 
 Mark current page: `class="tool-nav-link active" aria-current="page"`.
 
@@ -138,7 +139,7 @@ Tool-specific overrides go in `css/<tool>.css`, not shared.css, unless the chang
 
 ## Service worker (`sw.js`)
 
-- Cache name: `atrii-image-converter-v9` (increment on asset changes).
+- Cache name: `atrii-image-converter-v11` (increment on asset changes).
 - Precaches all HTML, CSS, JS, manifest, sitemap, robots, JSZip CDN.
 - **After adding/changing static files:** bump `CACHE_NAME` and add new paths to `urlsToCache`.
 - Users can clear via footer **Clear Cache** (unregisters SW + deletes caches + reloads).
@@ -190,6 +191,17 @@ Tool-specific overrides go in `css/<tool>.css`, not shared.css, unless the chang
 - `activeIndex` for fine rotation slider; `selectedSet` for batch ops.
 - `getRotatedBounds()` for dimension badges after rotation.
 
+### Icon Maker (`icon-maker.js`)
+- Single-icon editor (no batch drop zone). Master canvas 1024×1024.
+- Content modes: Iconify SVG, text, or uploaded image. Tint color applies to all three.
+- Effects chain (drop shadow, cast shadow, liquid glass) — ordered, drag-reorder.
+- Background: solid, linear/radial/mesh gradient, or image.
+- Badge overlay with 6 positions + width/height %.
+- Google Fonts via Fontsource catalog + CSS2 load; last Iconify pack in `imageIconMakerIconPack`.
+- Live Android/iOS home-screen mocks; Android **Themed** toggle uses monochrome glyph.
+- Export ZIP matches icon.kitchen: `android/res/mipmap-*` adaptive layers + `ios/` AppIcon catalog + `Contents.json`.
+- Iconify collections/search need network; text/image still render locally after fonts/SVGs load.
+
 ---
 
 ## External dependencies (CDN)
@@ -197,6 +209,8 @@ Tool-specific overrides go in `css/<tool>.css`, not shared.css, unless the chang
 | Package | URL | Used for |
 |---------|-----|----------|
 | Iconify | `code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js` | Lucide icons |
+| Iconify API | `api.iconify.design` | Icon Maker pack browse + SVG fetch |
+| Fontsource API | `api.fontsource.org/v1/fonts` | Icon Maker Google Fonts catalog |
 | JSZip | `cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js` | Batch ZIP |
 | Inter font | Google Fonts | Typography |
 

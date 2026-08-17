@@ -376,8 +376,27 @@ async function clearServiceWorkerCache() {
 clearCacheBtn.addEventListener('click', clearServiceWorkerCache);
 document.getElementById('footerYear').textContent = new Date().getFullYear();
 
+function isLocalHost() {
+    const host = location.hostname;
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '0.0.0.0';
+}
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
+        if (isLocalHost()) {
+            Promise.all([
+                navigator.serviceWorker.getRegistrations().then(registrations =>
+                    Promise.all(registrations.map(registration => registration.unregister()))
+                ),
+                caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))))
+            ]).then(() => {
+                if (navigator.serviceWorker.controller) {
+                    location.reload();
+                }
+            });
+            console.log('ServiceWorker skipped (local)');
+            return;
+        }
         navigator.serviceWorker.register('sw.js')
             .then(() => console.log('ServiceWorker registered'))
             .catch(error => console.log('ServiceWorker registration failed:', error));

@@ -2,7 +2,7 @@
 
 **Live:** [devatrii.github.io/Image-Converter-Offline](https://devatrii.github.io/Image-Converter-Offline/) · **Custom domain:** [atrii.dev](https://atrii.dev)
 
-A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize, crop, round corners, pick colors, rotate, flip, and batch export — with no uploads and no server processing.
+A fast, privacy-first image toolkit that runs entirely in your browser. Convert formats, resize, crop, round corners, pick colors, rotate, flip, design app icons, and batch export — with no uploads and no server processing.
 
 > **For contributors & AI agents:** see [`AGENT.md`](AGENT.md) for architecture, conventions, and a checklist for adding tools.
 
@@ -16,8 +16,9 @@ A fast, privacy-first image toolkit that runs entirely in your browser. Convert 
 | **Corner Rounder** | [`corners.html`](corners.html) | Round corners, add custom borders, and export |
 | **Color Picker** | [`colors.html`](colors.html) | Eyedropper, palette extraction, copy HEX/RGB/HSL |
 | **Image Rotator** | [`rotate.html`](rotate.html) | Fine rotation, flip, batch selection, and export |
+| **Icon Maker** | [`icon-maker.html`](icon-maker.html) | App icons from Iconify/text/image — Android + iOS ZIP |
 
-All tools share the same two-pane layout: **settings on the left**, **images on the right**. A centered tool nav bar links all six pages.
+All tools share the same two-pane layout: **settings on the left**, **preview on the right**. A centered tool nav bar links all seven pages.
 
 ---
 
@@ -120,6 +121,27 @@ Rotate and flip images with live preview, fine angle control, and batch export.
 
 ---
 
+## Icon Maker
+
+Design Android and iOS app icons from an Iconify glyph, custom text, or an uploaded image — then export a full adaptive / asset-catalog ZIP.
+
+### Features
+
+- **Iconify picker** — browse all packs, search icons, remembers last selected pack
+- **Text or image** — type a label or upload PNG/JPEG/WebP/GIF/SVG
+- **Color** — tint icon, text, and image
+- **Effects chain** — drop shadow, cast shadow, and liquid glass (compose in order, drag to reorder)
+- **Background** — solid color, linear / radial / mesh gradient, or image
+- **Badge** — text, colors, 6 positions, width and height
+- **Google Fonts** — searchable family list plus weight/italic styles
+- **Live previews** — Android and iOS home screens with the icon among other apps
+- **Themed toggle** — Android monochrome / Material You style preview
+- **ZIP export** — `android/res/mipmap-*` adaptive layers (foreground, background, monochrome, legacy) plus iOS `AppIcon` sizes and `Contents.json`
+
+Iconify packs and Google Fonts need a network connection the first time. Files never upload to a server.
+
+---
+
 ## Shared Features
 
 - **Privacy first** — files never leave your device
@@ -127,7 +149,7 @@ Rotate and flip images with live preview, fine angle control, and batch export.
 - **PWA ready** — service worker caches assets for offline use
 - **Clear cache** — one-click reset of service worker and cached pages after updates
 - **Responsive layout** — sidebar + main panel on desktop, stacked on mobile
-- **Unified tool nav** — switch between all six tools from any page
+- **Unified tool nav** — switch between all seven tools from any page
 
 ---
 
@@ -169,6 +191,7 @@ No install or build required.
 ├── corners.html        # Corner Rounder & Border Tool page
 ├── colors.html         # Image Color Picker page
 ├── rotate.html         # Image Rotator page
+├── icon-maker.html     # App Icon Maker page
 ├── css/
 │   ├── shared.css      # Design system, layout, shared components
 │   ├── converter.css   # Converter-specific styles (gallery, etc.)
@@ -176,7 +199,8 @@ No install or build required.
 │   ├── crop.css        # Cropper-specific styles (crop dialog, aspect grid)
 │   ├── corners.css     # Corners & border specific styles
 │   ├── colors.css      # Color picker styles
-│   └── rotate.css      # Rotator-specific styles
+│   ├── rotate.css      # Rotator-specific styles
+│   └── icon-maker.css  # Icon maker (picker modal, home-screen mocks)
 ├── js/
 │   ├── shared.js       # Theme, custom selects/sliders, utilities, service worker
 │   ├── converter.js    # Conversion logic and gallery
@@ -184,7 +208,8 @@ No install or build required.
 │   ├── crop.js         # Crop editor and export logic
 │   ├── corners.js      # Corner rounding, border, and export logic
 │   ├── colors.js       # Color picker and palette logic
-│   └── rotate.js       # Rotate, flip, and export logic
+│   ├── rotate.js       # Rotate, flip, and export logic
+│   └── icon-maker.js   # Icon editor, effects, previews, ZIP export
 ├── sw.js               # Service worker (offline cache)
 ├── manifest.json       # PWA manifest
 ├── sitemap.xml         # SEO sitemap (all tool pages)
@@ -220,7 +245,7 @@ To serve at a root domain (e.g. `atrii.dev`), point DNS to GitHub Pages and add 
 Cache name and precached URLs are defined in `sw.js`:
 
 ```js
-const CACHE_NAME = 'atrii-image-converter-v9';
+const CACHE_NAME = 'atrii-image-converter-v10';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -229,6 +254,7 @@ const urlsToCache = [
   '/corners.html',
   '/colors.html',
   '/rotate.html',
+  '/icon-maker.html',
   '/manifest.json',
   '/css/shared.css',
   // ...
@@ -255,7 +281,7 @@ The site includes:
 
 1. [Google Search Console](https://search.google.com/search-console) — add property `https://devatrii.github.io/Image-Converter-Offline/`
 2. Submit sitemap: `https://devatrii.github.io/Image-Converter-Offline/sitemap.xml`
-3. Request indexing for `/`, `/resizer.html`, `/crop.html`, `/corners.html`, `/colors.html`, and `/rotate.html`
+3. Request indexing for `/`, `/resizer.html`, `/crop.html`, `/corners.html`, `/colors.html`, `/rotate.html`, and `/icon-maker.html`
 
 If you use a custom domain (`atrii.dev`), set it as the primary domain in Search Console and keep canonical URLs consistent.
 

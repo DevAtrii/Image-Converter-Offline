@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free App Icon Maker — Android &amp; iOS Export | Icon Kitchen Style</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+    <meta name="description" content="Design app icons from Iconify icons, text, or images. Add colors, effects, badges, and backgrounds, then export Android adaptive + iOS asset catalog ZIPs — all in your browser.">
+    <meta name="keywords" content="app icon maker, android adaptive icon generator, ios app icon export, icon kitchen alternative, iconify app icon, monochrome themed icon, free icon generator">
+    <meta name="author" content="DevAtrii">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="googlebot" content="index, follow">
+    <link rel="canonical" href="https://devatrii.github.io/Image-Converter-Offline/icon-maker.html">
+    <meta property="og:site_name" content="Image Converter &amp; Resizer">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Free App Icon Maker — Android &amp; iOS Export">
+    <meta property="og:description" content="Build app icons from icons, text, or images. Export Android adaptive icons and iOS asset catalogs in one ZIP.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devatrii.github.io/Image-Converter-Offline/icon-maker.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Free App Icon Maker — Android &amp; iOS Export">
+    <meta name="twitter:description" content="Design app icons in your browser and export Android + iOS icon packs.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "App Icon Maker",
+        "url": "https://devatrii.github.io/Image-Converter-Offline/icon-maker.html",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "description": "Free in-browser app icon maker with Iconify, text, image, effects, badges, and Android/iOS ZIP export.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+            "Pick icons from Iconify packs",
+            "Text or image content",
+            "Chainable drop shadow, cast shadow, and liquid glass effects",
+            "Solid, gradient, mesh, and image backgrounds",
+            "Badge overlay with position and size",
+            "Google Fonts for text",
+            "Android adaptive + monochrome and iOS asset catalog export",
+            "Live Android and iOS home screen previews"
+        ],
+        "isAccessibleForFree": true,
+        "inLanguage": "en"
+    }
+    </script>
+    <meta name="theme-color" content="#15803d">
+    <meta name="msapplication-TileColor" content="#15803d">
+    <script>
+        (function () {
+            const key = 'imageConverterTheme';
+            const saved = localStorage.getItem(key);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
+    <link rel="preconnect" href="https://api.iconify.design">
+    <link rel="dns-prefetch" href="https://api.iconify.design">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/icon-maker.css">
+</head>
+<body>
+    <div class="container tool-page icon-maker-page">
+        <div class="tool-nav-wrap">
+            <nav class="tool-nav" aria-label="Tools">
+                <a href="index.html" class="tool-nav-link"><iconify-icon icon="lucide:refresh-cw" width="14" height="14"></iconify-icon>Converter</a>
+                <a href="resizer.html" class="tool-nav-link"><iconify-icon icon="lucide:scaling" width="14" height="14"></iconify-icon>Resizer</a>
+                <a href="crop.html" class="tool-nav-link"><iconify-icon icon="lucide:crop" width="14" height="14"></iconify-icon>Crop</a>
+                <a href="corners.html" class="tool-nav-link"><iconify-icon icon="lucide:square-round-corner" width="14" height="14"></iconify-icon>Corners</a>
+                <a href="colors.html" class="tool-nav-link"><iconify-icon icon="lucide:pipette" width="14" height="14"></iconify-icon>Colors</a>
+                <a href="rotate.html" class="tool-nav-link"><iconify-icon icon="lucide:rotate-cw" width="14" height="14"></iconify-icon>Rotate</a>
+                <a href="icon-maker.html" class="tool-nav-link active" aria-current="page"><iconify-icon icon="lucide:shapes" width="14" height="14"></iconify-icon>Icons</a>
+            </nav>
+        </div>
+
+        <header class="page-header tool-page-header">
+            <h1>App Icon Maker</h1>
+            <p>Design Android and iOS app icons from an Iconify glyph, text, or image. Live home-screen preview, then export a full adaptive + asset-catalog ZIP.</p>
+            <div class="badge-row">
+                <span class="badge">Android Adaptive</span>
+                <span class="badge">iOS Catalog</span>
+                <span class="badge">Iconify + Fonts</span>
+            </div>
+        </header>
+
+        <div class="tool-workspace">
+            <aside class="tool-sidebar">
+                <div class="tool-sidebar-inner">
+                    <div class="card im-acc open" id="accContent">
+                        <button class="im-acc-toggle" type="button" data-acc="accContent">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:layers" width="18" height="18"></iconify-icon>
+                                Content
+                            </h2>
+                            <iconify-icon class="im-acc-chevron" icon="lucide:chevron-down" width="16" height="16"></iconify-icon>
+                        </button>
+                        <div class="im-acc-body">
+                        <div class="card-content">
+                            <div class="mode-toggle" role="group" aria-label="Content type">
+                                <button class="mode-toggle-btn active" type="button" data-content="icon" id="contentIconBtn" aria-pressed="true">Icon</button>
+                                <button class="mode-toggle-btn" type="button" data-content="text" id="contentTextBtn" aria-pressed="false">Text</button>
+                                <button class="mode-toggle-btn" type="button" data-content="image" id="contentImageBtn" aria-pressed="false">Image</button>
+                            </div>
+
+                            <div class="form-group" id="iconContentSection">
+                                <label class="label label-icon">
+                                    <iconify-icon icon="lucide:box" width="14" height="14"></iconify-icon>
+                                    Iconify Icon
+                                </label>
+                                <button class="btn btn-outline im-icon-pick-btn" type="button" id="openIconPickerBtn">
+                                    <span class="im-icon-pick-preview" id="iconPickPreview"></span>
+                                    <span class="im-icon-pick-meta">
+                                        <span id="iconPickName">mdi:heart</span>
+                                        <span class="im-icon-pick-hint">Click to browse packs</span>
+                                    </span>
+                                    <iconify-icon icon="lucide:chevron-right" width="16" height="16"></iconify-icon>
+                                </button>
+                                <label class="im-check-row" id="iconTintRow">
+                                    <input type="checkbox" id="tintIcon" checked>
+                                    <span>Tint icon color</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group hidden" id="textContentSection">
+                                <label class="label label-icon" for="contentText">
+                                    <iconify-icon icon="lucide:type" width="14" height="14"></iconify-icon>
+                                    Text
+                                </label>
+                                <input class="input" type="text" id="contentText" maxlength="24" value="Aa" placeholder="App">
+                            </div>
+
+                            <div class="form-group hidden" id="imageContentSection">
+                                <label class="label label-icon">
+                                    <iconify-icon icon="lucide:image" width="14" height="14"></iconify-icon>
+                                    Upload Image
+                                </label>
+                                <div class="im-image-drop" id="contentImageDrop">
+                                    <iconify-icon class="im-image-drop-icon" icon="lucide:upload" width="28" height="28"></iconify-icon>
+                                    <p class="im-image-drop-text">Drop image here or browse</p>
+                                    <span class="im-upload-name" id="contentImageName">No file</span>
+                                    <button class="btn btn-outline btn-sm" type="button" id="contentImageBtnPick">
+                                        <iconify-icon icon="lucide:folder-open" width="14" height="14"></iconify-icon>
+                                        Choose file
+                                    </button>
+                                </div>
+                                <input type="file" id="contentImageInput" hidden accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml">
+                                <label class="im-check-row" id="imageTintRow">
+                                    <input type="checkbox" id="tintImage">
+                                    <span>Tint image color</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" id="contentColorSection">
+                                <label class="label label-icon" for="contentColorHex">
+                                    <iconify-icon icon="lucide:palette" width="14" height="14"></iconify-icon>
+                                    Color
+                                </label>
+                                <div class="color-picker-row">
+                                    <div class="color-input-wrap">
+                                        <input type="color" id="contentColorPicker" value="#ffffff">
+                                    </div>
+                                    <input class="input color-hex-input" type="text" id="contentColorHex" value="#FFFFFF" maxlength="7">
+                                </div>
+                                <div class="color-swatches" id="contentColorSwatches">
+                                    <button class="swatch-btn active" type="button" data-color="#ffffff" style="background: #ffffff;" title="White"></button>
+                                    <button class="swatch-btn" type="button" data-color="#000000" style="background: #000000;" title="Black"></button>
+                                    <button class="swatch-btn" type="button" data-color="#15803d" style="background: #15803d;" title="Green"></button>
+                                    <button class="swatch-btn" type="button" data-color="#3b82f6" style="background: #3b82f6;" title="Blue"></button>
+                                    <button class="swatch-btn" type="button" data-color="#f43f5e" style="background: #f43f5e;" title="Rose"></button>
+                                    <button class="swatch-btn" type="button" data-color="#eab308" style="background: #eab308;" title="Yellow"></button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="label label-icon" id="contentScaleLabel">
+                                    <iconify-icon icon="lucide:maximize-2" width="14" height="14"></iconify-icon>
+                                    Size
+                                </label>
+                                <div class="range-wrap">
+                                    <div class="custom-slider" id="contentScaleSlider" role="slider" aria-labelledby="contentScaleLabel" aria-valuemin="20" aria-valuemax="100" aria-valuenow="56" tabindex="0"></div>
+                                    <input class="input range-number-input" type="number" id="contentScaleInput" min="20" max="100" value="56">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <button class="im-reveal-btn" type="button" id="contentPosToggle" aria-expanded="false" aria-controls="contentPosFields">
+                                    <span class="label label-icon">
+                                        <iconify-icon icon="lucide:move" width="14" height="14"></iconify-icon>
+                                        Position
+                                    </span>
+                                    <iconify-icon class="im-acc-chevron" icon="lucide:chevron-down" width="14" height="14"></iconify-icon>
+                                </button>
+                                <div class="im-reveal-body hidden" id="contentPosFields">
+                                    <div class="im-pos-row">
+                                        <div class="im-pos-grid" id="contentPosGrid" role="group" aria-label="Content position">
+                                            <button class="im-pos-btn" type="button" data-pos="top-start" data-x="0" data-y="0" title="Top start"></button>
+                                            <button class="im-pos-btn" type="button" data-pos="top-center" data-x="50" data-y="0" title="Top center"></button>
+                                            <button class="im-pos-btn" type="button" data-pos="top-end" data-x="100" data-y="0" title="Top end"></button>
+                                            <button class="im-pos-btn" type="button" data-pos="center-start" data-x="0" data-y="50" title="Center start"></button>
+                                            <button class="im-pos-btn active" type="button" data-pos="center" data-x="50" data-y="50" title="Center"></button>
+                                            <button class="im-pos-btn" type="button" data-pos="center-end" data-x="100" data-y="50" title="Center end"></button>
+                                            <button class="im-pos-btn" type="button" data-pos="bottom-start" data-x="0" data-y="100" title="Bottom start"></button>
+                                            <button class="im-pos-btn" type="button" data-pos="bottom-center" data-x="50" data-y="100" title="Bottom center"></button>
+                                            <button class="im-pos-btn" type="button" data-pos="bottom-end" data-x="100" data-y="100" title="Bottom end"></button>
+                                        </div>
+                                        <div class="im-pos-sliders">
+                                            <div class="form-group">
+                                                <label class="label label-icon" id="contentXLabel">
+                                                    <iconify-icon icon="lucide:move-horizontal" width="14" height="14"></iconify-icon>
+                                                    Horizontal
+                                                </label>
+                                                <div class="range-wrap">
+                                                    <div class="custom-slider" id="contentXSlider" role="slider" aria-labelledby="contentXLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"></div>
+                                                    <input class="input range-number-input" type="number" id="contentXInput" min="0" max="100" value="50">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="label label-icon" id="contentYLabel">
+                                                    <iconify-icon icon="lucide:move-vertical" width="14" height="14"></iconify-icon>
+                                                    Vertical
+                                                </label>
+                                                <div class="range-wrap">
+                                                    <div class="custom-slider" id="contentYSlider" role="slider" aria-labelledby="contentYLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"></div>
+                                                    <input class="input range-number-input" type="number" id="contentYInput" min="0" max="100" value="50">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="card im-acc" id="accEffects">
+                        <button class="im-acc-toggle" type="button" data-acc="accEffects">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:sparkles" width="18" height="18"></iconify-icon>
+                                Effects
+                            </h2>
+                            <iconify-icon class="im-acc-chevron" icon="lucide:chevron-down" width="16" height="16"></iconify-icon>
+                        </button>
+                        <div class="im-acc-body">
+                        <div class="card-content">
+                            <div class="im-effect-add-row">
+                                <div class="custom-select" id="addEffectSelect" role="combobox" aria-label="Effect type" aria-haspopup="listbox"></div>
+                                <button class="btn btn-outline btn-sm" type="button" id="addEffectBtn">
+                                    <iconify-icon icon="lucide:plus" width="14" height="14"></iconify-icon>
+                                    Add
+                                </button>
+                            </div>
+                            <div class="im-effect-chain" id="effectChain"></div>
+                            <p class="settings-tip" id="effectEmptyTip">
+                                <iconify-icon icon="lucide:info" width="14" height="14"></iconify-icon>
+                                <span>Add effects in order. Drag to reorder — they compose like modifiers.</span>
+                            </p>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="card im-acc open" id="accBackground">
+                        <button class="im-acc-toggle" type="button" data-acc="accBackground">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:paint-bucket" width="18" height="18"></iconify-icon>
+                                Background
+                            </h2>
+                            <iconify-icon class="im-acc-chevron" icon="lucide:chevron-down" width="16" height="16"></iconify-icon>
+                        </button>
+                        <div class="im-acc-body">
+                        <div class="card-content">
+                            <div class="mode-toggle" role="group" aria-label="Background type">
+                                <button class="mode-toggle-btn active" type="button" data-bg="color" id="bgTypeColorBtn" aria-pressed="true">Color</button>
+                                <button class="mode-toggle-btn" type="button" data-bg="gradient" id="bgTypeGradientBtn" aria-pressed="false">Gradient</button>
+                                <button class="mode-toggle-btn" type="button" data-bg="image" id="bgTypeImageBtn" aria-pressed="false">Image</button>
+                            </div>
+
+                            <div id="bgColorSection">
+                                <div class="form-group">
+                                    <label class="label label-icon" for="bgColorHex">
+                                        <iconify-icon icon="lucide:droplet" width="14" height="14"></iconify-icon>
+                                        Fill Color
+                                    </label>
+                                    <div class="color-picker-row">
+                                        <div class="color-input-wrap">
+                                            <input type="color" id="bgColorPicker" value="#4f46e5">
+                                        </div>
+                                        <input class="input color-hex-input" type="text" id="bgColorHex" value="#4F46E5" maxlength="7">
+                                    </div>
+                                    <div class="color-swatches" id="bgColorSwatches">
+                                        <button class="swatch-btn" type="button" data-color="#4f46e5" style="background: #4f46e5;" title="Indigo"></button>
+                                        <button class="swatch-btn" type="button" data-color="#15803d" style="background: #15803d;" title="Green"></button>
+                                        <button class="swatch-btn" type="button" data-color="#0f172a" style="background: #0f172a;" title="Slate"></button>
+                                        <button class="swatch-btn" type="button" data-color="#f43f5e" style="background: #f43f5e;" title="Rose"></button>
+                                        <button class="swatch-btn" type="button" data-color="#f59e0b" style="background: #f59e0b;" title="Amber"></button>
+                                        <button class="swatch-btn" type="button" data-color="#ffffff" style="background: #ffffff;" title="White"></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hidden" id="bgGradientSection">
+                                <div class="form-group">
+                                    <label class="label label-icon" id="gradientKindLabel">
+                                        <iconify-icon icon="lucide:blend" width="14" height="14"></iconify-icon>
+                                        Gradient Type
+                                    </label>
+                                    <div class="custom-select" id="gradientKind" role="combobox" aria-labelledby="gradientKindLabel" aria-haspopup="listbox"></div>
+                                </div>
+                                <div class="form-group" id="gradientAngleGroup">
+                                    <label class="label label-icon" id="gradientAngleLabel">
+                                        <iconify-icon icon="lucide:rotate-cw" width="14" height="14"></iconify-icon>
+                                        Angle
+                                    </label>
+                                    <div class="range-wrap">
+                                        <div class="custom-slider" id="gradientAngleSlider" role="slider" aria-labelledby="gradientAngleLabel" aria-valuemin="0" aria-valuemax="360" aria-valuenow="135" tabindex="0"></div>
+                                        <input class="input range-number-input" type="number" id="gradientAngleInput" min="0" max="360" value="135">
+                                    </div>
+                                </div>
+                                <div class="form-group" id="gradientStopsGroup">
+                                    <span class="label label-icon">
+                                        <iconify-icon icon="lucide:swatch-book" width="14" height="14"></iconify-icon>
+                                        Stops
+                                    </span>
+                                    <div id="gradientStops"></div>
+                                    <button class="btn btn-ghost btn-sm" type="button" id="addGradientStopBtn">
+                                        <iconify-icon icon="lucide:plus" width="14" height="14"></iconify-icon>
+                                        Add stop
+                                    </button>
+                                </div>
+                                <div class="form-group hidden" id="meshColorsGroup">
+                                    <span class="label label-icon">
+                                        <iconify-icon icon="lucide:grid-2x2" width="14" height="14"></iconify-icon>
+                                        Mesh stops
+                                    </span>
+                                    <p class="im-hint">Drag stops to move. Click to select. Add / remove below.</p>
+                                    <div class="im-mesh-editor">
+                                        <canvas id="meshEditor" width="220" height="220" aria-label="Mesh editor"></canvas>
+                                    </div>
+                                    <div class="im-mesh-tools">
+                                        <div class="color-picker-row">
+                                            <div class="color-input-wrap">
+                                                <input type="color" id="meshStopColor" value="#4f46e5">
+                                            </div>
+                                            <input class="input color-hex-input" type="text" id="meshStopHex" value="#4F46E5" maxlength="7">
+                                        </div>
+                                        <div class="im-mesh-actions">
+                                            <button class="btn btn-outline btn-sm" type="button" id="meshAddStopBtn">
+                                                <iconify-icon icon="lucide:plus" width="14" height="14"></iconify-icon>
+                                                Add stop
+                                            </button>
+                                            <button class="btn btn-ghost btn-sm" type="button" id="meshRemoveStopBtn">
+                                                <iconify-icon icon="lucide:trash-2" width="14" height="14"></iconify-icon>
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group hidden" id="bgImageSection">
+                                <label class="label label-icon">
+                                    <iconify-icon icon="lucide:image" width="14" height="14"></iconify-icon>
+                                    Background Image
+                                </label>
+                                <div class="im-upload-row">
+                                    <button class="btn btn-outline" type="button" id="bgImageBtnPick">
+                                        <iconify-icon icon="lucide:upload" width="14" height="14"></iconify-icon>
+                                        Choose file
+                                    </button>
+                                    <span class="im-upload-name" id="bgImageName">No file</span>
+                                </div>
+                                <input type="file" id="bgImageInput" hidden accept="image/png,image/jpeg,image/webp,image/gif">
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="card im-acc" id="accBadge">
+                        <button class="im-acc-toggle" type="button" data-acc="accBadge">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:badge" width="18" height="18"></iconify-icon>
+                                Badge
+                            </h2>
+                            <iconify-icon class="im-acc-chevron" icon="lucide:chevron-down" width="16" height="16"></iconify-icon>
+                        </button>
+                        <div class="im-acc-body">
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="im-check-row">
+                                    <input type="checkbox" id="badgeEnabled">
+                                    <span>Show badge</span>
+                                </label>
+                            </div>
+                            <div id="badgeFields" class="hidden">
+                                <div class="form-group">
+                                    <label class="label label-icon" for="badgeText">
+                                        <iconify-icon icon="lucide:type" width="14" height="14"></iconify-icon>
+                                        Badge Text
+                                    </label>
+                                    <input class="input" type="text" id="badgeText" maxlength="16" value="NEW">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" for="badgeTextColorHex">
+                                        <iconify-icon icon="lucide:palette" width="14" height="14"></iconify-icon>
+                                        Text Color
+                                    </label>
+                                    <div class="color-picker-row">
+                                        <div class="color-input-wrap">
+                                            <input type="color" id="badgeTextColorPicker" value="#ffffff">
+                                        </div>
+                                        <input class="input color-hex-input" type="text" id="badgeTextColorHex" value="#FFFFFF" maxlength="7">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" for="badgeBgColorHex">
+                                        <iconify-icon icon="lucide:paint-bucket" width="14" height="14"></iconify-icon>
+                                        Badge Background
+                                    </label>
+                                    <div class="color-picker-row">
+                                        <div class="color-input-wrap">
+                                            <input type="color" id="badgeBgColorPicker" value="#ef4444">
+                                        </div>
+                                        <input class="input color-hex-input" type="text" id="badgeBgColorHex" value="#EF4444" maxlength="7">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon">
+                                        <iconify-icon icon="lucide:move" width="14" height="14"></iconify-icon>
+                                        Position
+                                    </label>
+                                    <div class="im-pos-grid" id="badgePosGrid" role="group" aria-label="Badge position">
+                                        <button class="im-pos-btn" type="button" data-pos="top-start" data-x="0" data-y="0" title="Top start"></button>
+                                        <button class="im-pos-btn" type="button" data-pos="top-center" data-x="50" data-y="0" title="Top center"></button>
+                                        <button class="im-pos-btn" type="button" data-pos="top-end" data-x="100" data-y="0" title="Top end"></button>
+                                        <button class="im-pos-btn" type="button" data-pos="center-start" data-x="0" data-y="50" title="Center start"></button>
+                                        <button class="im-pos-btn" type="button" data-pos="center" data-x="50" data-y="50" title="Center"></button>
+                                        <button class="im-pos-btn" type="button" data-pos="center-end" data-x="100" data-y="50" title="Center end"></button>
+                                        <button class="im-pos-btn" type="button" data-pos="bottom-start" data-x="0" data-y="100" title="Bottom start"></button>
+                                        <button class="im-pos-btn active" type="button" data-pos="bottom-center" data-x="50" data-y="100" title="Bottom center"></button>
+                                        <button class="im-pos-btn" type="button" data-pos="bottom-end" data-x="100" data-y="100" title="Bottom end"></button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" id="badgeRadiusLabel">
+                                        <iconify-icon icon="lucide:radius" width="14" height="14"></iconify-icon>
+                                        Corner radius
+                                    </label>
+                                    <div class="range-wrap">
+                                        <div class="custom-slider" id="badgeRadiusSlider" role="slider" aria-labelledby="badgeRadiusLabel" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0" tabindex="0"></div>
+                                        <input class="input range-number-input" type="number" id="badgeRadiusInput" min="0" max="50" value="0">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" id="badgeWidthLabel">
+                                        <iconify-icon icon="lucide:move-horizontal" width="14" height="14"></iconify-icon>
+                                        Width %
+                                    </label>
+                                    <div class="range-wrap">
+                                        <div class="custom-slider" id="badgeWidthSlider" role="slider" aria-labelledby="badgeWidthLabel" aria-valuemin="20" aria-valuemax="100" aria-valuenow="100" tabindex="0"></div>
+                                        <input class="input range-number-input" type="number" id="badgeWidthInput" min="20" max="100" value="100">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label label-icon" id="badgeHeightLabel">
+                                        <iconify-icon icon="lucide:move-vertical" width="14" height="14"></iconify-icon>
+                                        Height %
+                                    </label>
+                                    <div class="range-wrap">
+                                        <div class="custom-slider" id="badgeHeightSlider" role="slider" aria-labelledby="badgeHeightLabel" aria-valuemin="10" aria-valuemax="50" aria-valuenow="22" tabindex="0"></div>
+                                        <input class="input range-number-input" type="number" id="badgeHeightInput" min="10" max="50" value="22">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="card im-acc hidden" id="accFont">
+                        <button class="im-acc-toggle" type="button" data-acc="accFont">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:a-large-small" width="18" height="18"></iconify-icon>
+                                Font
+                            </h2>
+                            <iconify-icon class="im-acc-chevron" icon="lucide:chevron-down" width="16" height="16"></iconify-icon>
+                        </button>
+                        <div class="im-acc-body">
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="label label-icon" id="fontTargetLabel">
+                                    <iconify-icon icon="lucide:text-cursor-input" width="14" height="14"></iconify-icon>
+                                    Apply to
+                                </label>
+                                <div class="custom-select" id="fontTarget" role="combobox" aria-labelledby="fontTargetLabel" aria-haspopup="listbox"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label label-icon">
+                                    <iconify-icon icon="lucide:search" width="14" height="14"></iconify-icon>
+                                    Family
+                                </label>
+                                <div class="im-font-picker" id="fontPicker">
+                                    <button class="btn btn-outline im-font-trigger" type="button" id="fontFamilyBtn">
+                                        <span id="fontFamilyLabel">Inter</span>
+                                        <iconify-icon icon="lucide:chevron-down" width="14" height="14"></iconify-icon>
+                                    </button>
+                                    <div class="im-font-dropdown hidden" id="fontDropdown">
+                                        <input class="input" type="search" id="fontSearch" placeholder="Search Google Fonts…" autocomplete="off">
+                                        <div class="im-font-list" id="fontList" role="listbox"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label label-icon" id="fontStyleLabel">
+                                    <iconify-icon icon="lucide:bold" width="14" height="14"></iconify-icon>
+                                    Style
+                                </label>
+                                <div class="custom-select" id="fontStyle" role="combobox" aria-labelledby="fontStyleLabel" aria-haspopup="listbox"></div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="card im-acc" id="accExport">
+                        <button class="im-acc-toggle" type="button" data-acc="accExport">
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:file-output" width="18" height="18"></iconify-icon>
+                                Export
+                            </h2>
+                            <iconify-icon class="im-acc-chevron" icon="lucide:chevron-down" width="16" height="16"></iconify-icon>
+                        </button>
+                        <div class="im-acc-body">
+                        <div class="card-content">
+                            <div class="form-group">
+                                <span class="label label-icon">
+                                    <iconify-icon icon="lucide:smartphone" width="14" height="14"></iconify-icon>
+                                    Platforms
+                                </span>
+                                <label class="im-check-row">
+                                    <input type="checkbox" id="exportAndroid" checked>
+                                    <span>Android (adaptive + Play Store)</span>
+                                </label>
+                                <label class="im-check-row">
+                                    <input type="checkbox" id="exportIos" checked>
+                                    <span>iOS (AppIcon.appiconset)</span>
+                                </label>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-actions">
+                        <button class="btn btn-primary" type="button" id="exportBtn">
+                            <iconify-icon icon="lucide:download" width="16" height="16"></iconify-icon>
+                            Export ZIP
+                        </button>
+                        <button class="btn btn-outline" type="button" id="clearIconCacheBtn">
+                            <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>
+                            Clear saved settings
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="tool-main">
+                <div class="card tool-main-card">
+                    <div class="card-header tool-main-header">
+                        <div>
+                            <h2 class="card-title card-title-icon">
+                                <iconify-icon icon="lucide:app-window" width="18" height="18"></iconify-icon>
+                                Preview
+                            </h2>
+                            <p class="card-description">Live icon plus Android and iOS home screens.</p>
+                        </div>
+                    </div>
+                    <div class="card-content tool-main-content im-main">
+                        <div class="im-stage">
+                            <div class="im-preview-wrap shape-squircle">
+                                <div id="iconPreview" class="im-preview-live" aria-label="Icon preview"></div>
+                            </div>
+                            <div class="im-shape-row" role="group" aria-label="Adaptive shape">
+                                <button class="im-shape-btn" type="button" data-shape="circle" title="Circle">
+                                    <span class="im-shape-icon im-shape-circle"></span>
+                                </button>
+                                <button class="im-shape-btn active" type="button" data-shape="squircle" title="Squircle">
+                                    <span class="im-shape-icon im-shape-squircle"></span>
+                                </button>
+                                <button class="im-shape-btn" type="button" data-shape="rounded" title="Rounded">
+                                    <span class="im-shape-icon im-shape-rounded"></span>
+                                </button>
+                                <button class="im-shape-btn" type="button" data-shape="square" title="Square">
+                                    <span class="im-shape-icon im-shape-square"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="im-homes">
+                            <div class="im-home-col">
+                                <div class="im-home-head">
+                                    <span class="im-home-title">
+                                        <iconify-icon icon="lucide:smartphone" width="14" height="14"></iconify-icon>
+                                        Android
+                                    </span>
+                                    <label class="im-themed-toggle">
+                                        <input type="checkbox" id="themedToggle">
+                                        <span>Themed</span>
+                                    </label>
+                                </div>
+                                <div class="im-phone android-phone" id="androidPhone">
+                                    <div class="im-phone-status">9:41</div>
+                                    <div class="im-app-grid" id="androidGrid"></div>
+                                    <div class="im-android-nav"></div>
+                                </div>
+                            </div>
+                            <div class="im-home-col">
+                                <div class="im-home-head">
+                                    <span class="im-home-title">
+                                        <iconify-icon icon="lucide:app-window" width="14" height="14"></iconify-icon>
+                                        iOS
+                                    </span>
+                                </div>
+                                <div class="im-phone ios-phone" id="iosPhone">
+                                    <div class="im-phone-status im-phone-status-ios">9:41</div>
+                                    <div class="im-app-grid im-ios-grid" id="iosGrid"></div>
+                                    <div class="im-ios-dock" id="iosDock"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="progress" id="progress">
+                            <div class="spinner"></div>
+                            <span id="progressLabel">Exporting icons…</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <section class="seo-section" aria-labelledby="icon-maker-seo-heading">
+            <h2 id="icon-maker-seo-heading">Free in-browser app icon maker — Android adaptive and iOS catalogs</h2>
+            <p>Build launcher icons from an <strong>Iconify</strong> glyph, custom text, or an uploaded image. Tint color, chain drop / cast / liquid-glass effects, add solid / gradient / mesh / image backgrounds, and overlay a badge. Export a ZIP that matches Icon Kitchen layout: Android <code>mipmap-*</code> adaptive layers plus iOS <code>AppIcon</code> sizes and <code>Contents.json</code>.</p>
+            <p>Iconify packs and Google Fonts need a network connection the first time. Text and image modes still render locally after assets load. Files never upload to a server.</p>
+            <div class="seo-columns">
+                <div>
+                    <h3>Also try</h3>
+                    <ul>
+                        <li><a href="index.html">Image Converter</a> — change formats</li>
+                        <li><a href="resizer.html">Image Resizer</a> — resize, rotate &amp; flip</li>
+                        <li><a href="crop.html">Image Cropper</a> — crop with aspect ratios</li>
+                        <li><a href="corners.html">Corner Rounder</a> — round corners &amp; add borders</li>
+                        <li><a href="colors.html">Color Picker</a> — pick colors from images</li>
+                        <li><a href="rotate.html">Image Rotator</a> — rotate and flip images</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Use cases</h3>
+                    <ul>
+                        <li>Android adaptive + themed monochrome icons</li>
+                        <li>iOS App Store 1024 marketing icon</li>
+                        <li>KMP / Flutter / React Native app icon packs</li>
+                        <li>Quick badge overlays (NEW, BETA, PRO)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <iconify-icon icon="lucide:shapes" width="18" height="18"></iconify-icon>
+                        App Icon Maker
+                    </div>
+                    <p class="footer-brand-desc">
+                        Design Android and iOS app icons in your browser. Iconify, text, or image — with effects, badges, and a full adaptive ZIP export.
+                    </p>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Features</h3>
+                    <ul class="footer-links">
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Iconify picker + Google Fonts</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Chainable effects &amp; badges</li>
+                        <li><iconify-icon icon="lucide:check" width="14" height="14"></iconify-icon> Android + iOS ZIP export</li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Settings</h3>
+                    <div class="footer-settings">
+                        <div>
+                            <div class="footer-setting-label">Appearance</div>
+                            <div class="theme-switcher" role="group" aria-label="Theme">
+                                <button class="theme-toggle-btn" type="button" id="themeLightBtn" aria-pressed="true" aria-label="Light mode">
+                                    <iconify-icon icon="lucide:sun" width="14" height="14"></iconify-icon>
+                                    <span>Light</span>
+                                </button>
+                                <button class="theme-toggle-btn" type="button" id="themeDarkBtn" aria-pressed="false" aria-label="Dark mode">
+                                    <iconify-icon icon="lucide:moon" width="14" height="14"></iconify-icon>
+                                    <span>Dark</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="footer-setting-label">Storage</div>
+                            <button class="footer-btn" type="button" id="clearCacheBtn">
+                                <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>
+                                Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-column-title">Connect</h3>
+                    <div class="footer-social-links">
+                        <a href="https://github.com/DevAtrii/Image-Converter-Offline" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            <iconify-icon icon="lucide:github" width="16" height="16"></iconify-icon>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="footerYear"></span> App Icon Maker. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="im-dialog hidden" id="iconDialog" role="dialog" aria-modal="true" aria-label="Choose icon">
+        <div class="im-dialog-backdrop" id="iconDialogBackdrop"></div>
+        <div class="im-dialog-shell">
+            <div class="im-dialog-toolbar">
+                <div class="im-dialog-search-wrap">
+                    <iconify-icon icon="lucide:search" width="16" height="16"></iconify-icon>
+                    <input class="input" type="search" id="iconSearchInput" placeholder="Search all Iconify icons…" autocomplete="off">
+                </div>
+                <button class="btn btn-outline btn-icon btn-sm" type="button" id="iconDialogCloseBtn" title="Close" aria-label="Close">
+                    <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+                </button>
+            </div>
+            <div class="im-dialog-body">
+                <aside class="im-pack-pane">
+                    <button type="button" class="im-pack-btn im-all-packs-btn" id="allPacksBtn">
+                        <span class="im-pack-samples">
+                            <iconify-icon icon="lucide:layout-grid" width="14" height="14"></iconify-icon>
+                        </span>
+                        <span class="im-pack-name">All packs</span>
+                    </button>
+                    <input class="input" type="search" id="packSearchInput" placeholder="Filter packs…" autocomplete="off">
+                    <div class="im-pack-list" id="packList"></div>
+                </aside>
+                <div class="im-icon-pane">
+                    <div class="im-icon-pane-head">
+                        <span id="packTitle">Loading packs…</span>
+                        <span class="im-icon-count" id="iconCount"></span>
+                    </div>
+                    <div class="im-pack-icon-search hidden" id="packIconSearchWrap">
+                        <iconify-icon icon="lucide:search" width="14" height="14"></iconify-icon>
+                        <input class="input" type="search" id="packIconSearchInput" placeholder="Search this pack…" autocomplete="off">
+                    </div>
+                    <div class="im-icon-grid" id="iconGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/icon-maker.js"></script>
+</body>
+</html>
